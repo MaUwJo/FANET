@@ -174,6 +174,7 @@ boolean fanet_manufacturer_check (byte _manufactur_id)
 		case 0x04: return 1; break;
 		case 0x05: return 1; break;
 		case 0x06: return 1; break;
+		case 0x07: return 1; break;
 		case 0x11: return 1; break;										
 
 		case 0xFC: return 1; break;
