@@ -1,34 +1,35 @@
 /*
  * fanet_global.c
- * 
+ *
  * Copyright 2018  <pi@RPi3B_FANET_2>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
- * 
+ *
+ *
  */
 
 #ifndef FANET_GLOBAL_C
 #define FANET_GLOBAL_C
 
 #include <stdio.h>
-#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "fanet_struct.c"
+#include "fanet_struct.h"
+#include "fanet_global.h"
 
 #define pi 3.14159265358979323846
 
@@ -86,7 +87,7 @@ double rad2deg(double rad) {
 	Latitude = value_lat/93206	\in [-90, +90]
 	Longitude = value_lon/46603 \in [-180, +180]
 	(Note: 32bit floating point is required for direct conversion)
- 
+
  ***********************************************************************/
 void decode_abs_coordination (char _input[], float *_latitude, float *_longitude)
 {
@@ -99,33 +100,33 @@ void decode_abs_coordination (char _input[], float *_latitude, float *_longitude
 	latitude_int <<=8;
 	latitude_int += _input[0];
 	*_latitude = latitude_int/(float)93206;
-		
+
 	longitude_int =  _input[5];
 	longitude_int <<=8;
 	longitude_int += _input[4];
 	longitude_int <<=8;
 	longitude_int += _input[3];
-	*_longitude = longitude_int/(float)46603;	
+	*_longitude = longitude_int/(float)46603;
 }
 
 void code_abs_coordination (sRawMessage *_tx_message, sWeather *_weather_data)
 {
 	signed int	_latitude_int;
 	signed int	_longitude_int;
-	
+
 	if (_weather_data->latitude > 90)
 		_weather_data->latitude = 0;
 	if (_weather_data->latitude < -90)
-		_weather_data->latitude = 0;	
+		_weather_data->latitude = 0;
 
 	if (_weather_data->longitude > 180)
 		_weather_data->longitude = 0;
 	if (_weather_data->longitude < -180)
 		_weather_data->longitude = 0;
-	
+
 	_latitude_int  = round(_weather_data->latitude*93206);
 	_longitude_int = round(_weather_data->longitude*46603);
-	
+
 	_tx_message->message[_tx_message->m_length]   = _latitude_int&0x000000FF;
 	_tx_message->message[_tx_message->m_length+1] = (_latitude_int&0x0000FF00)>>8;
 	_tx_message->message[_tx_message->m_length+2] = (_latitude_int&0x00FF0000)>>16;
@@ -133,7 +134,7 @@ void code_abs_coordination (sRawMessage *_tx_message, sWeather *_weather_data)
 	_tx_message->message[_tx_message->m_length+3] = _longitude_int&0x000000FF;
 	_tx_message->message[_tx_message->m_length+4] = (_longitude_int&0x0000FF00)>>8;
 	_tx_message->message[_tx_message->m_length+5] = (_longitude_int&0x00FF0000)>>16;
-	
+
 	_tx_message->m_length += 6;
 }
 
@@ -146,12 +147,12 @@ void address_int (char *_address_string, byte *_manuf, uint16_t *_id)
 {
 	char _addr_manuf[4];
 	char _addr_id[6];
-	
+
 	strncpy (_addr_manuf, _address_string, 2);
 	_addr_manuf[2] =0;
 	*_manuf = (byte)strtol(_addr_manuf,NULL,16);
 
-	strncpy (_addr_id, _address_string+3, 4);	
+	strncpy (_addr_id, _address_string+3, 4);
 	_addr_id[4] =0;
 	*_id = (int)strtol(_addr_id,NULL,16);
 }
@@ -161,7 +162,7 @@ boolean fanet_type_check (byte _fanet_type)
 	if (_fanet_type <= 7)
 		return 1;
 	else
-		return 0;	
+		return 0;
 }
 
 boolean fanet_manufacturer_check (byte _manufactur_id)
@@ -171,19 +172,19 @@ boolean fanet_manufacturer_check (byte _manufactur_id)
 		case 0x00: return 1; break;
 		case 0x01: return 1; break;
 		case 0x03: return 1; break;
-		case 0x04: return 1; break;
+		case 0x04: return 1; break;     // AirWhere
 		case 0x05: return 1; break;
 		case 0x06: return 1; break;
-		case 0x07: return 1; break;
-		case 0x11: return 1; break;										
+		case 0x07: return 1; break;     // SoftRF
+		case 0x11: return 1; break;
 
 		case 0xFC: return 1; break;
 		case 0xFD: return 1; break;
 		case 0xFE: return 1; break;
-		case 0xFF: return 1; break;	
+		case 0xFF: return 1; break;
 
 		default: return 0; break;
-	}		
+	}
 }
 
 boolean fanet_own_id_checker (sFanetMAC *_fanet_mac)
@@ -193,13 +194,13 @@ boolean fanet_own_id_checker (sFanetMAC *_fanet_mac)
 		switch (_fanet_mac->d_unique_id)
 		{
 			case 0x9001: return 1; break;
-			case 0x9002: return 1; break;			
+			case 0x9002: return 1; break;
 			case 0x9003: return 1; break;
 			case 0x9004: return 1; break;
 			case 0x9005: return 1; break;
 			case 0x9006: return 1; break;
 
-			default: return 0; break;	
+			default: return 0; break;
 		}
 	}
 	else

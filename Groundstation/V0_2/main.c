@@ -34,16 +34,17 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "fanet_struct.c"
-#include "fanet_radio.c"
-#include "fanet_mac.c"
-#include "fanet_mysql.c"
-#include "fanet_terminal.c"
-#include "fanet_t0_ack.c"
-#include "fanet_t1_tracking.c"
-#include "fanet_t3_messenger.c"
-#include "fanet_t4_service.c"
-#include "fanet_routing.c"
+#include "fanet_struct.h"
+#include "fanet_radio.h"
+#include "fanet_mac.h"
+#include "fanet_mysql.h"
+#include "fanet_terminal.h"
+#include "fanet_t0_ack.h"
+#include "fanet_t1_tracking.h"
+#include "fanet_t2_name.h"
+#include "fanet_t3_messenger.h"
+#include "fanet_t4_service.h"
+#include "fanet_routing.h"
 
 #include <sys/ioctl.h> 
 
@@ -73,6 +74,7 @@ void die(const char *s)
     exit(1);
 }
 
+extern unsigned int  freq; // = 868200000; // in Hz! (868.2)  - TTTTT
 
 void system_data ()
 {
@@ -235,16 +237,27 @@ int main (int argc, char *argv[])
 	//char _minute_new;
 	//char _minute_old;
 
-    sql_login();
+    //sql_login();
     
-    /*if (argc < 2) {
-        printf ("Usage: argv[0] sender|rec [message]\n");
-        exit(1);
-    }*/
+   // if (argc < 2) {
+    //    printf ("Usage: argv[0] sender|rec [message]\n");
+     //   exit(1);
+   // }
 
     init_fanet_radio();
 
     delay(2000);
+
+    if (argc > 0) {
+        printf ("-- %s \n", argv[1]);
+    }
+    if (argc > 1) {
+        printf ("-- %s \n", argv[2]);
+	send_mess(argv[1]);
+        printf ("--\n");
+	exit(0);
+    }
+
 
     //start_screen();
     terminal_start_screen(sf, 250, freq);

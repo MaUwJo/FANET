@@ -25,14 +25,12 @@
 #define FANET_T1_TRACKING_C
 
 #include <stdio.h>
-#include "fanet_mac.c"
-#include "fanet_struct.c"
-#include "fanet_terminal.c"
-#include "fanet_global.c"
-#include "fanet_mysql.c"
-
-#define STATION_LAT  46.684681			// Position of Ground Statation -> Is needed to calculate the distance to the tracked object 
-#define STATION_LON  7.867658			// Modfied if necessary
+#include "fanet_mac.h"
+#include "fanet_struct.h"
+#include "fanet_terminal.h"
+#include "fanet_global.h"
+#include "fanet_mysql.h"
+#include "fanet_t1_tracking.h"
 
 
 void decode_tracking (sRawMessage *_rx_message, sTRACKING *_tracking)

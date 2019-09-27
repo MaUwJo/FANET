@@ -25,13 +25,15 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
-#include "fanet_mac.c"
-#include "fanet_struct.c"
-#include "fanet_mysql.c"
-#include "fanet_global.c"
-#include "fanet_radio.c"
-#include "fanet_t2_name.c"
-#include "fanet_terminal.c"
+#include "fanet_mac.h"
+#include "fanet_struct.h"
+#include "fanet_mysql.h"
+#include "fanet_global.h"
+#include "fanet_radio.h"
+#include "fanet_t2_name.h"
+#include "fanet_terminal.h"
+#include "fanet_t4_service.h"
+
 
 // Configure the Weather Stations (In a next Version: Better solution to read out a SQL databench)
 const char * stations_id [] = {
@@ -41,9 +43,12 @@ const char * stations_id [] = {
 	"windline-5200",
 	"windline-4115",
 	"windline-4109"};
+
 #define N_STATIONS (sizeof (stations_id) / sizeof (const char *))
+
 const byte source_manufacturer_id = 0xFC;
 const uint16_t source_unique_id [] = {0x9001,0x9002,0x9003,0x9004,0x9005,0x9006};
+
 
 #define	START_OFFSET_DATA	4;				// Starts the first transmission of weather data after 4 sec. when the software has started
 #define START_OFFSET_NAME	8;				// Starts the first transmission of weather station name after 8 sec. when the software has started

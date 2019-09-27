@@ -27,13 +27,11 @@
 #include <stdio.h>
 //#include <math.h>
 //#include <time.h>
-#include "fanet_mac.c"
-#include "fanet_struct.c"
-#include "fanet_terminal.c"
-#include "fanet_global.c"
-//#include "fanet_mysql.c"
-//#include "fanet_global.c"
-//#include "fanet_radio.c"
+#include "fanet_mac.h"
+#include "fanet_struct.h"
+#include "fanet_terminal.h"
+#include "fanet_global.h"
+#include "fanet_t0_ack.h"
 
 void type_0_ack_decoder (sRawMessage *_rx_payload, sACK *_rx_ack)
 {

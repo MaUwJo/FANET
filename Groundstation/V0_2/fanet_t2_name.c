@@ -25,10 +25,11 @@
 #define FANET_T2_NAME_C
 
 #include <stdio.h>
-#include "fanet_struct.c"
-#include "fanet_terminal.c"
-#include "fanet_mysql.c"
+#include "fanet_struct.h"
+#include "fanet_terminal.h"
+#include "fanet_mysql.h"
 
+#include "fanet_t2_name.h"
 
 void type_2_name_decoder (sRawMessage *_rx_payload, sName *_rx_name)
 {

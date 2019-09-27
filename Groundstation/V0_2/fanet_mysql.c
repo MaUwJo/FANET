@@ -27,9 +27,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <mysql/mysql.h>
-#include "fanet_struct.c"
-#include "fanet_global.c"
+//#include <mysql/mysql.h>
+#include <mysql.h>
+#include "fanet_struct.h"
+#include "fanet_global.h"
+#include "fanet_mysql.h"
 
 #define KNRM  "\x1B[0m"		// Color: Normal
 #define KRED  "\x1B[31m"	// Color: Red
@@ -74,9 +76,10 @@ void sql_finish_with_error(MYSQL *conn)
 void sql_login (void)
 {
 	char *_sql_server = "localhost";
-	char *_sql_user = "pi";
-	char *_sql_password = "raspberry"; /* set me first */
-	char *_sql_database = "FANET";
+	char *_sql_user = "FAN";
+	char *_sql_password = "Geheim17!"; /* set me first */
+	//char *_sql_database = "FANET";
+	char *_sql_database = "FAN";
 
 	if (function_debug) printf("[%sFUNC%s]  sql_login()\n",KCYN, KNRM);
 

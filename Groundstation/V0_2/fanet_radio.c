@@ -24,6 +24,7 @@
 #ifndef FANET_RADIO_C
 #define FANET_RADIO_C
 
+#include "fanet_radio.h"
 
 /***********************************************************************
  * FANET radio
@@ -38,12 +39,13 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
 #include "sx1276Regs-LoRa.h"
 
-#include "fanet_struct.c"
-#include "fanet_terminal.c"
+#include "fanet_struct.h"
+#include "fanet_terminal.h"
 
 typedef unsigned char byte;
 
@@ -54,7 +56,6 @@ int ssPin = 6;
 int dio0  = 7;
 int RST   = 0;
 
-// Set FANET center frequency
 unsigned int  freq = 868200000; // in Hz! (868.2)
 
 sRadioData	radio_data;

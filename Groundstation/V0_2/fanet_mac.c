@@ -29,9 +29,10 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "fanet_struct.c"
-#include "fanet_radio.c"
-#include "fanet_global.c"
+#include "fanet_mac.h"
+#include "fanet_struct.h"
+#include "fanet_radio.h"
+#include "fanet_global.h"
 
 
 
@@ -106,31 +107,31 @@ void fanet_mac_coder (sRadioData *_radiodata, sFanetMAC *_fanet_mac, sRawMessage
 
 void fanet_mac_decoder (sFanetMAC *_fanet_mac, sRawMessage *_rx_message, sRawMessage *_rx_payload)
 {
-	_fanet_mac->e_header 		= FALSE;
-	_fanet_mac->forward  		= FALSE;
+	_fanet_mac->e_header 		= false;
+	_fanet_mac->forward  		= false;
 	_fanet_mac->type			= 0;
-	_fanet_mac->cast          	= FALSE;
-	_fanet_mac->signature_bit 	= FALSE;
+	_fanet_mac->cast          	= false;
+	_fanet_mac->signature_bit 	= false;
 	_fanet_mac->s_manufactur_id = 0;
 	_fanet_mac->s_unique_id		= 0;
 	_fanet_mac->d_manufactur_id = 0;
 	_fanet_mac->d_unique_id		= 0;
 	_fanet_mac->signature		= 0;
-	_fanet_mac->valid_bit		= TRUE;				// If a MAC error is detected, set bit to false
+	_fanet_mac->valid_bit		= true;				// If a MAC error is detected, set bit to false
 	_rx_payload->m_length 		= 0;
 	
 	if (_rx_message->m_length >= 4)					// Check if minimum FANET data are received/available
 	{
-		if (_rx_message->message[0]&0x80) _fanet_mac->e_header = TRUE; else	_fanet_mac->e_header = FALSE;
-		if (_rx_message->message[0]&0x40) _fanet_mac->forward  = TRUE; else _fanet_mac->forward  = FALSE;
+		if (_rx_message->message[0]&0x80) _fanet_mac->e_header = true; else _fanet_mac->e_header = false;
+		if (_rx_message->message[0]&0x40) _fanet_mac->forward  = true; else _fanet_mac->forward  = false;
 	
 		_fanet_mac->type			 = (_rx_message->message[0]&0x3F);	
 		if (!fanet_type_check(_fanet_mac->type))	// Check if valid FANET type is received/available
-			_fanet_mac->valid_bit = FALSE;
+			_fanet_mac->valid_bit = false;
 		
 		_fanet_mac->s_manufactur_id  = _rx_message->message[1];
 		if (!fanet_manufacturer_check(_fanet_mac->s_manufactur_id))	// Check if valid FANET manufacturer is received/available
-			_fanet_mac->valid_bit = FALSE;
+			_fanet_mac->valid_bit = false;
 		
 		_fanet_mac->s_unique_id		 = (_rx_message->message[3])<<8;
 		_fanet_mac->s_unique_id 	+= _rx_message->message[2];
@@ -140,11 +141,11 @@ void fanet_mac_decoder (sFanetMAC *_fanet_mac, sRawMessage *_rx_message, sRawMes
 		if (_fanet_mac->e_header)
 		{
 			_fanet_mac->ack = (_rx_message->message[_rx_message->m_pointer]&0xC0)>>6;
-			if(_rx_message->message[_rx_message->m_pointer]&0x20) _fanet_mac->cast          = TRUE; else _fanet_mac->cast          = FALSE;
+			if(_rx_message->message[_rx_message->m_pointer]&0x20) _fanet_mac->cast          = true; else _fanet_mac->cast          = false;
 			if (_fanet_mac->ack && !_fanet_mac->cast)	// Check if ACK is set, CAST bit is set too
-				_fanet_mac->valid_bit = FALSE;	
+				_fanet_mac->valid_bit = false;	
 			
-			if(_rx_message->message[_rx_message->m_pointer]&0x10) _fanet_mac->signature_bit = TRUE; else _fanet_mac->signature_bit = FALSE;
+			if(_rx_message->message[_rx_message->m_pointer]&0x10) _fanet_mac->signature_bit = true; else _fanet_mac->signature_bit = false;
 		
 			_rx_message->m_pointer += 1;
 		}
@@ -153,7 +154,7 @@ void fanet_mac_decoder (sFanetMAC *_fanet_mac, sRawMessage *_rx_message, sRawMes
 		{
 			_fanet_mac->d_manufactur_id  = _rx_message->message[_rx_message->m_pointer];
 			if (!fanet_manufacturer_check(_fanet_mac->d_manufactur_id))	// Check if valid FANET manufacturer is received/available
-				_fanet_mac->valid_bit = FALSE;
+				_fanet_mac->valid_bit = false;
 				
 			_fanet_mac->d_unique_id		 = (_rx_message->message[_rx_message->m_pointer+2])<<8;
 			_fanet_mac->d_unique_id 	+= _rx_message->message[_rx_message->m_pointer+1];		
@@ -179,7 +180,7 @@ void fanet_mac_decoder (sFanetMAC *_fanet_mac, sRawMessage *_rx_message, sRawMes
 		}
 	}
 	else
-		_fanet_mac->valid_bit = FALSE;		
+		_fanet_mac->valid_bit = false;		
 }
 
 #endif
