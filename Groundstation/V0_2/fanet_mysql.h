@@ -24,6 +24,8 @@
 #ifndef FANET_MYSQL_H
 #define FANET_MYSQL_H
 
+void sql_login (void); 
+
 void get_weather_data(sWeather *_weather_data);
 
 void get_weather_station(sWeather *_weather_data);
