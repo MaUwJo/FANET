@@ -67,7 +67,9 @@ void init_rpi_spi(void);
 
 void setup_sx1276_LoRa (void);
 
-void init_fanet_radio();
+void init_fanet_radio_b();
+
+void init_fanet_radio(int _delay, boolean _show_msg);
 
 #endif
 

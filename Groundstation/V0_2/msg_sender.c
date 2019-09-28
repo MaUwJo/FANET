@@ -37,7 +37,7 @@
 #include "fanet_struct.h"
 #include "fanet_radio.h"
 #include "fanet_mac.h"
-//#include "fanet_mysql.h"
+#include "fanet_mysql.h"
 #include "fanet_terminal.h"
 #include "fanet_t0_ack.h"
 //#include "fanet_t1_tracking.h"
@@ -75,59 +75,12 @@ void die(const char *s)
     exit(1);
 }
 
-/*
-void receivepacket()
-{
-	sFanetMAC	  _fanet_mac;
-	sRawMessage   _rx_radio;
-	sRawMessage	  _rx_payload;
-	sRadioData 	  _radiodata;
-
-	if(read_rx_data(&_rx_radio, &_radiodata))
-    {
-		_fanet_mac.valid_bit = 1;
-
-		if (_radiodata.crc_err)
-			terminal_message_crc_err (0,0,&_radiodata, &_fanet_mac);
-
-		fanet_mac_decoder (&_fanet_mac, &_rx_radio, &_rx_payload);
-		if (!_fanet_mac.valid_bit)
-			terminal_message_mac_err (0,0,&_radiodata, &_fanet_mac);
-
-		terminal_message_raw (0,0, &_radiodata, &_fanet_mac, &_rx_radio);
-
-
-		if (_fanet_mac.valid_bit && !_radiodata.crc_err)
-		{
-			switch (_fanet_mac.type)
-			{
-//				case 0:	type_0_ack_receiver(&_radiodata, &_fanet_mac, &_rx_payload); break;
-//				case 1:	type_1_tracking_receiver(&_radiodata, &_fanet_mac, &_rx_payload); break;
-				case 2:	type_2_name_receiver(&_radiodata, &_fanet_mac, &_rx_payload); break;
-				case 3: type_3_message_receiver(&_radiodata, &_fanet_mac, &_rx_payload); break;
-//				case 4: type_4_service_receiver(&_radiodata, &_fanet_mac, &_rx_payload); break;
-				//default: terminal_mac_info (0,0,&_fanet_mac); printf ("\n");
-			}
-			if (_fanet_mac.ack)
-				send_ack (&_fanet_mac);
-		}
-		else
-		{
-//			terminal_rf_info (0,0,&_radiodata, &_fanet_mac);
-//			terminal_mac_info (0,0,&_radiodata, &_fanet_mac); printf ("\n");
-		}
-
-//TTT		update_routing (&_radiodata, &_fanet_mac);
-    }
-}
-*/
-
 int main (int argc, char *argv[])
 {
 
-    init_fanet_radio();
+	sql_login();
 
-    //delay(1000);
+    init_fanet_radio(1000, false);
 
     if (argc > 0) {
         printf ("Message: %s \n", argv[1]);

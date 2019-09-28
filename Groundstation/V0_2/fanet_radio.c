@@ -389,17 +389,28 @@ void setup_sx1276_LoRa (void)
 }
 
 
-void init_fanet_radio()
+void init_fanet_radio_b()
 {
 	init_rpi_spi();
 	setup_sx1276_LoRa();
 
 	opmode(RFLR_OPMODE_STANDBY);
-    configPower(15);
-    opmode(RFLR_OPMODE_RECEIVER);
-	
-	show_register();
-	delay (2000);
+	configPower(15);
+	opmode(RFLR_OPMODE_RECEIVER);
+}
+
+void init_fanet_radio(int _delay, boolean _show_msg)
+{ 
+	if (_show_msg) {
+		printf("-- Initializing --");
+	}
+
+	init_fanet_radio_b();
+
+	if (_show_msg) {
+		show_register();
+	}
+	delay (_delay);
 }
 
 

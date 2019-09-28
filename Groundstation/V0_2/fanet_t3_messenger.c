@@ -21,7 +21,6 @@
  *
  */
 
-
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
@@ -34,18 +33,16 @@
 #include "fanet_t3_messenger.h"
 
 #define STATION_MANUF	0xFC
-#define STATION_ID		0x9002
+#define STATION_ID	0x9002
 
-//#define	WELCOME_MESSAGE_LIFETIME	43200 //86400 	// 86400 sec = 24:00:00 h
-#define	WELCOME_MESSAGE_LIFETIME	15 //86400 	// 86400 sec = 24:00:00 h
+#define	WELCOME_MESSAGE_LIFETIME	43200 //86400 	// 86400 sec = 24:00:00 h
 #define	ONLINE_AGE		60			// Online if object is not older than 60 sec.
 
 #define	START_OFFSET_MESSENGER	6;
 #define INTERVAL_MESSENGER		20;
 
 
-unsigned char    WELCOME_MESSAGE[] = "Willkommen im Fluggebiet Interlaken. Testbetrieb der ersten FANET-Bodenstation. Kontakt: christoph@betschart.ch";
-
+unsigned char    WELCOME_MESSAGE[] = "Willkommen im Fluggebiet - Test FANET-Bodenstation. Kontakt: christoph@betschart.ch";
 
 
 void type_3_message_decoder (sRawMessage *_rx_raw_message, sMessage *_rx_message)

@@ -244,9 +244,7 @@ int main (int argc, char *argv[])
      //   exit(1);
    // }
 
-    init_fanet_radio();
-
-    delay(2000);
+    init_fanet_radio(1000, true);
 
     //start_screen();
     terminal_start_screen(sf, 250, freq);
