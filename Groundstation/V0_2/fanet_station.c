@@ -44,6 +44,7 @@
 #include "fanet_t2_name.h"
 #include "fanet_t3_messenger.h"
 #include "fanet_t4_service.h"
+#include "fanet_t7_tracking.h"
 #include "fanet_routing.h"
 
 #include <sys/ioctl.h>
@@ -210,6 +211,7 @@ void receivepacket()
 				case 2:	type_2_name_receiver(&_radiodata, &_fanet_mac, &_rx_payload); break;
 				case 3: type_3_message_receiver(&_radiodata, &_fanet_mac, &_rx_payload); break;
 				case 4: type_4_service_receiver(&_radiodata, &_fanet_mac, &_rx_payload); break;
+				case 7:	type_7_tracking_receiver(&_radiodata, &_fanet_mac, &_rx_payload); break;
 				//default: terminal_mac_info (0,0,&_fanet_mac); printf ("\n");
 			}
 			if (_fanet_mac.ack)

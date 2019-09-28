@@ -16,6 +16,7 @@ OBJS= fanet_routing.o \
         fanet_t2_name.o \
         fanet_t3_messenger.o \
         fanet_t4_service.o \
+        fanet_t7_tracking.o\
         fanet_global.o \
         fanet_mac.o \
         fanet_mysql.o \

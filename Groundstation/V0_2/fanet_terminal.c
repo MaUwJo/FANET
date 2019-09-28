@@ -198,13 +198,13 @@ void terminal_mac_info (boolean _rxtx, boolean _integrity, sRadioData *_radiodat
 void terminal_message_raw (boolean _rxtx, boolean _integrity, sRadioData *_radiodata, sFanetMAC *_mac_data, sRawMessage *_raw_message)
 {
 	terminal_rf_info (_rxtx, _integrity, _radiodata, _mac_data);
-	//terminal_mac_info (_rxtx, _integrity, _mac_data);
+	//terminal_mac_info (_rxtx, _integrity, _mac_data); 
 
 	// Raw Data
 	if (_rxtx) printf(KCYN); else printf(KGRN);
 	if (_radiodata->crc_err || !_mac_data->valid_bit) printf(KYEL);
 	//printf(BOLD);
-	printf ("    %3d",_raw_message->m_length);
+	printf ("len:%3d",_raw_message->m_length);
 	printf (KNRM); printf("|");
 
 	if (_rxtx) printf(KCYN); else printf(KGRN);
@@ -471,6 +471,48 @@ void terminal_message_4 (boolean _rxtx, boolean _integrity, sRadioData *_radioda
 	if (_rxtx) printf(KCYN); else printf(KGRN);
 	if (_radiodata->crc_err) printf(KYEL);
 	if (_weather_data->barom) printf(" %7.2fhPa",_weather_data->barometric); else printf("    -.--hPa");
+	printf (KNRM); printf("|");
+
+	printf("\n");
+
+}
+
+
+/***********************************************************************
+ * Shows the FANET message 7 (Ground Tracking) on the terminal
+ *
+ * *********************************************************************
+ * Ver | Date     | Sign | Describtion
+ * ---------------------------------------------------------------------
+ * 0.3 |28.09.2019|  mr  | Init Version
+ **********************************************************************/
+void terminal_message_7 (boolean _rxtx, boolean _integrity, sRadioData *_radiodata, sFanetMAC *_mac_data, sTRACKING *_tracking)
+{
+	terminal_rf_info (_rxtx, _integrity, _radiodata, _mac_data);
+	terminal_mac_info (_rxtx, _integrity, _radiodata, _mac_data);
+
+	// Latitude
+	if (_rxtx) printf(KCYN); else printf(KGRN);
+	if (_radiodata->crc_err) printf(KYEL);
+	printf(" %+9.5f°",_tracking->latitude);
+	printf (KNRM); printf("|");
+
+	// Longitude
+	if (_rxtx) printf(KCYN); else printf(KGRN);
+	if (_radiodata->crc_err) printf(KYEL);
+	printf(" %+9.5f°",_tracking->longitude);
+	printf (KNRM); printf("|");
+
+	// Online Tracking
+	if (_rxtx) printf(KCYN); else printf(KGRN);
+	if (_radiodata->crc_err) printf(KYEL);
+	printf(" %d",_tracking->tracking);
+	printf (KNRM); printf("|");
+
+	// Aircraft type
+	if (_rxtx) printf(KCYN); else printf(KGRN);
+	if (_radiodata->crc_err) printf(KYEL);
+	printf("    %d",_tracking->aircraft_type);
 	printf (KNRM); printf("|");
 
 	printf("\n");
