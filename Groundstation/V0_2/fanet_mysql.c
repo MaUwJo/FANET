@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <mysql/mysql.h>
-#include <mysql.h>
+//#include <mysql.h>
 #include "fanet_struct.h"
 #include "fanet_global.h"
 #include "fanet_mysql.h"
@@ -46,6 +46,7 @@ char SQL_query_debug = 0;
 char function_debug  = 0;
 char message_debug   = 0;
 
+#if 0 // TTT
 MYSQL *conn;
 MYSQL_RES *res;
 MYSQL_ROW row;
@@ -607,67 +608,72 @@ void sql_search_last_welcome_message (MYSQL *_conn, MYSQL_RES *_res, MYSQL_ROW _
 		if (_row[1]!=NULL) {(_message->time = atoi(_row[1]));}
 	}		
 }
-
+#endif
 
 
 void get_weather_data(sWeather *_weather_data)
 {
-	sql_get_weather_values (conn, res, row, _weather_data);
+//	sql_get_weather_values (conn, res, row, _weather_data);
+// get dynamic weather data or dummy
 }
 
 
 void get_weather_station(sWeather *_weather_data)
 {
-	sql_get_weather_station (conn, res, row, _weather_data);
+//	sql_get_weather_station (conn, res, row, _weather_data);
 }
 
 
 void write_system_data_1min (sSystem *_system_data)
 {
-	sql_write_system_data_1min (conn, res, row, _system_data);
+//	sql_write_system_data_1min (conn, res, row, _system_data);
 }
 
 
 void write_system_data_15min (sSystem *_system_data)
 {
-	sql_write_system_data_15min (conn, res, row, _system_data);
+//	sql_write_system_data_15min (conn, res, row, _system_data);
 }
 
 
 void write_object_tracking (sRadioData *_radiodata, sFanetMAC *_fanet_mac, sTRACKING *_tracking)
 {
-	sql_write_tracking_data (conn, res, row, _radiodata, _fanet_mac, _tracking);
+//	sql_write_tracking_data (conn, res, row, _radiodata, _fanet_mac, _tracking);
 }
 
 
 void write_object_name (sRadioData *_radiodata, sFanetMAC *_fanet_mac, sName *_name)
 {
-	sql_write_object_name (conn, res, row, _radiodata, _fanet_mac, _name);
+//	sql_write_object_name (conn, res, row, _radiodata, _fanet_mac, _name);
 }
 
 void update_routing_table (sRouting *_routing_data)
 {
-	sql_update_routing_table (conn, res, row, _routing_data);
+//	sql_update_routing_table (conn, res, row, _routing_data);
 }
 
 void write_message_send (sMessage *_message)
 {
-	sql_write_message_send (conn, res, row, _message);
+//	sql_write_message_send (conn, res, row, _message);
 }
 
 void search_last_welcome_message (sMessage *_message)
 {
-	sql_search_last_welcome_message (conn, res, row, _message);
+//	sql_search_last_welcome_message (conn, res, row, _message);
 }
 
 void search_online_address (sOnline *_online)
 {
-	sql_search_online_address (conn, res, row, _online);
+//	sql_search_online_address (conn, res, row, _online);
 }
 
 void delete_old_data (void)
 {
-	sql_delete_old_data (conn, res, row);
+//	sql_delete_old_data (conn, res, row);
+}
+
+void sql_login (void) {
+// dummy
 }
 
 #endif
