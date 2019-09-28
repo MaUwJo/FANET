@@ -2,7 +2,8 @@
 
 #CC=g++
 #CFLAGS=-c -Wall `mysql_config --cflags` `mysql_config --libs`
-CFLAGS=-c -Wall -I /usr/include/mariadb/server 
+#CFLAGS=-c -Wall -I /usr/include/mariadb/server
+CFLAGS=-c -Wall
 
 CC=gcc
 #CFLAGS=-c -Wall -o `mysql_config --libs` `mysql_config --cflags`
@@ -35,7 +36,6 @@ fanet_station: 	$(OBJS) fanet_station.o
 
 msg_sender: $(OBJS) msg_sender.o
 	$(CC) $(OBJS) msg_sender.o $(LIBS) -o msg_sender
-
 
 clean:
 	rm *.o $(TARGETS)
