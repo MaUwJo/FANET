@@ -621,8 +621,12 @@ void get_weather_data(sWeather *_weather_data)
 void get_weather_station(sWeather *_weather_data)
 {
 //	sql_get_weather_station (conn, res, row, _weather_data);
+    strcpy (_weather_data->name, "Germersche/Palz");
+    strcpy (_weather_data->short_name, "GERPLZ");
+    _weather_data->longitude = 8.224818;
+    _weather_data->latitude  = 49.131702;
+    _weather_data->altitude  = 111;
 }
-
 
 void write_system_data_1min (sSystem *_system_data)
 {
