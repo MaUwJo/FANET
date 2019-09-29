@@ -663,22 +663,22 @@ void get_weather_station(sWeather *_weather_data)
 //	sql_get_weather_station (conn, res, row, _weather_data);
     if (0 == strcmp(_weather_data->id_station, "GER-4217")) {
         // GER - Dummy
-        strcpy (_weather_data->name, "Germersche/Palz");
-        strcpy (_weather_data->short_name, "GERPLZ");
+        strcpy (_weather_data->name, "GS:Germersche/Palz");
+        strcpy (_weather_data->short_name, "GS:GERPLZ");
         _weather_data->longitude =  8.224818;
         _weather_data->latitude  = 49.131702;
         _weather_data->altitude  = 111;
     } else if (0 == strcmp(_weather_data->id_station, "HF711")) {
         // https://holfuy.com/de/map/la=49.20255&lo=8.00506&z=14
-        strcpy (_weather_data->name, "Hohenberg/Pfalz");
-        strcpy (_weather_data->short_name, "Hohe");
+        strcpy (_weather_data->name, "Holfuy-WS 711 - Hohenberg/Pfalz");
+        strcpy (_weather_data->short_name, "WS711:Hohe");
         _weather_data->longitude =  8.00506;
         _weather_data->latitude  = 49.20255;
         _weather_data->altitude  = 111;
     } else if (0 == strcmp(_weather_data->id_station, "HF795")) {
         // https://holfuy.com/de/map/la=49.23716&lo=8.02495&z=14
-        strcpy (_weather_data->name, "Orensberg/Pfalz");
-        strcpy (_weather_data->short_name, "Ori");
+        strcpy (_weather_data->name, "Holfuy-WS 795 - Orensberg/Pfalz");
+        strcpy (_weather_data->short_name, "WS795:Ori");
         _weather_data->longitude =  8.02495;
         _weather_data->latitude  = 49.23716;
         _weather_data->altitude  = 111;
