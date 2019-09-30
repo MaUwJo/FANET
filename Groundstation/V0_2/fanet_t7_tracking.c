@@ -29,13 +29,13 @@
 #include "fanet_struct.h"
 #include "fanet_terminal.h"
 #include "fanet_global.h"
-#include "fanet_mysql.h"
+#include "fanet_db.h"
 #include "fanet_t1_tracking.h"
 
 // 4913.1702,N,00822.4818,E 
 // TODO: Get from configuration dynamically from geo-localisation
-#define STATION_LAT  49.131702   // Position of Ground Statation -> Is needed to calculate the distance to the tracked object ^M
-#define STATION_LON  8.224818    // Modfied if necessary^M
+//#define STATION_LAT  49.131702   // Position of Ground Statation -> Is needed to calculate the distance to the tracked object ^M
+//#define STATION_LON  8.224818    // Modfied if necessary^M
 
 
 void decode_ground_tracking (sRawMessage *_rx_message, sTRACKING *_tracking)
@@ -78,7 +78,9 @@ void type_7_tracking_decoder (sRawMessage *_rx_payload, sTRACKING *_rx_tracking)
 	_rx_tracking->longitude = _longitude;
 	_rx_payload->m_pointer += 6;
 
-	_rx_tracking->distance = distance (STATION_LAT, STATION_LON, _rx_tracking->latitude, _rx_tracking->longitude, 'K');
+	_rx_tracking->distance = distance (
+	        this_station_data->latitude, this_station_data->longitude,
+	        _rx_tracking->latitude, _rx_tracking->longitude, 'K');
 
 	decode_ground_tracking (_rx_payload, _rx_tracking);
 	decode_ground_type (_rx_payload, _rx_tracking);
