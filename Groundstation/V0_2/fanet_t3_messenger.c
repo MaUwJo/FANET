@@ -26,7 +26,7 @@
 #include <time.h>
 #include "fanet_mac.h"
 #include "fanet_struct.h"
-#include "fanet_mysql.h"
+#include "fanet_db.h"
 #include "fanet_global.h"
 #include "fanet_radio.h"
 
