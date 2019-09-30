@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "fanet_struct.h"
-#include "fanet_mysql.h"
+#include "fanet_db.h"
 #include "fanet_routing.h"
 
 void update_routing (sRadioData *_radiodata, sFanetMAC *_mac_data)

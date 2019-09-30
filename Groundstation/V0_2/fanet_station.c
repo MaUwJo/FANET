@@ -37,7 +37,7 @@
 #include "fanet_struct.h"
 #include "fanet_radio.h"
 #include "fanet_mac.h"
-#include "fanet_mysql.h"
+#include "fanet_db.h"
 #include "fanet_terminal.h"
 #include "fanet_t0_ack.h"
 #include "fanet_t1_tracking.h"
@@ -227,6 +227,8 @@ void receivepacket()
     }
 }
 
+sWeather this_station;
+sWeather *this_station_data = &this_station;
 
 int main (int argc, char *argv[])
 {
@@ -239,7 +241,14 @@ int main (int argc, char *argv[])
 	//char _minute_new;
 	//char _minute_old;
 
-    sql_login();
+    if (argc > 1) {
+        if (0==strcmp(argv[1], "db_init")) {
+            db_init("FANET_Station.db");
+            exit(0);
+        }
+    }
+    db_login("FANET_Station.db");
+    get_station_parameters(this_station_data);
 
    // if (argc < 2) {
     //    printf ("Usage: argv[0] sender|rec [message]\n");
