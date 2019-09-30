@@ -91,19 +91,15 @@ int get_holfuy_weather(const char* holfuy_id, sWeather *_weather) {
     hf_chunk.memory = malloc(1);  /* will be grown as needed by the realloc above */
     hf_chunk.size = 0;    /* no data at this point */
     curl_handle = curl_easy_init();
-
     curl_easy_setopt(curl_handle, CURLOPT_URL, url);
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)&hf_chunk);
     curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "libcurl-agent/1.0");
-
     res = curl_easy_perform(curl_handle);
-
     if(res != CURLE_OK) {
         fprintf(stderr, "curl_easy_perform() failed: %s\n",
                 curl_easy_strerror(res));
-    }
-    else {
+    } else {
         char **parsed = parse_csv(hf_chunk.memory);
         float float_value;
         removeSpaces(parsed[0]); // leading space in result string
@@ -155,7 +151,6 @@ int get_holfuy_weather(const char* holfuy_id, sWeather *_weather) {
             error = 1;
         }
     }
-
     curl_easy_cleanup(curl_handle);
     free(hf_chunk.memory);
     curl_global_cleanup();
@@ -165,17 +160,17 @@ int get_holfuy_weather(const char* holfuy_id, sWeather *_weather) {
 int main(int argc, char *argv[])
 {
     curl_global_init(CURL_GLOBAL_ALL);
-
+/*
     strcpy(hf711_weather.id_station, "HF711");
     strcpy(hf711_weather.name, "Holfuy Station Hohenberg");
     strcpy(hf711_weather.short_name, "HF711/Hohe");
     strcpy(hf795_weather.id_station, "HF795");
     strcpy(hf795_weather.name, "Holfuy Station Orensberg");
     strcpy(hf795_weather.short_name, "HF795/Ori");
-    get_holfuy_weather(hf795_weather.id_station+2, &hf795_weather);
+*/
     get_holfuy_weather("711", &hf711_weather);
+    get_holfuy_weather("795", &hf795_weather);
 
     curl_global_cleanup();
-
     return 0;
 }
