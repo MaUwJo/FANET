@@ -31,6 +31,8 @@
 
 #define pi 3.14159265358979323846
 
+extern sWeather *this_station_data;
+
 double deg2rad(double);
 double rad2deg(double);
 

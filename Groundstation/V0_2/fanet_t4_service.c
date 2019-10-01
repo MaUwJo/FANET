@@ -27,7 +27,7 @@
 #include <time.h>
 #include "fanet_mac.h"
 #include "fanet_struct.h"
-#include "fanet_mysql.h"
+#include "fanet_db.h"
 #include "fanet_global.h"
 #include "fanet_radio.h"
 #include "fanet_t2_name.h"
@@ -323,7 +323,7 @@ void fanet_t4_service_scheduler (void)
 		
 		strcpy(_tx_weather_data.id_station, stations_id[_i_data]);
 
-		get_weather_station (&_tx_weather_data);
+		get_weather_station (stations_id[_i_data], &_tx_weather_data);
 		get_weather_data (&_tx_weather_data);
 		//printf("Longitude %f\n", _weather_data.longitude);
 		type_4_service_coder (&_tx_message, &_tx_weather_data);
@@ -351,7 +351,7 @@ void fanet_t4_service_scheduler (void)
 		
 		strcpy(_tx_weather_data.id_station, stations_id[_i_name]);
 
-		get_weather_station (&_tx_weather_data);
+		get_weather_station (stations_id[_i_name], &_tx_weather_data);
 		
 		strcpy(_tx_name.name, _tx_weather_data.short_name);
 		_tx_name.n_length = strlen(_tx_name.name);

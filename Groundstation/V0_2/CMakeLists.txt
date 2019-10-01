@@ -5,18 +5,21 @@ set(CMAKE_C_STANDARD 11)
 
 include_directories(. /usr/local/include /usr/include)
 
+add_executable(get_holfuy get_holfuy.c csv.c csv.h)
+
+
 add_executable(fanet_station
+        fanet_station.c
         fanet_global.c
         fanet_global.h
         fanet_mac.c
         fanet_mac.h
-        fanet_mysql.c
-        fanet_mysql.h
+        fanet_db.c
+        fanet_db.h
         fanet_radio.c
         fanet_radio.h
         fanet_routing.c
         fanet_routing.h
-        fanet_station.c
         fanet_struct.c
         fanet_struct.h
         fanet_t0_ack.c
@@ -35,4 +38,5 @@ add_executable(fanet_station
         fanet_terminal.h
         sx1276Regs-LoRa.h)
 
-target_link_libraries(fanet_station m wiringPi)
+target_link_libraries(fanet_station m wiringPi sqlite3)
+target_link_libraries(get_holfuy sqlite3 curl)

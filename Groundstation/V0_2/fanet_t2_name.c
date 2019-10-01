@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include "fanet_struct.h"
 #include "fanet_terminal.h"
-#include "fanet_mysql.h"
+#include "fanet_db.h"
 
 #include "fanet_t2_name.h"
 
