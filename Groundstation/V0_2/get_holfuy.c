@@ -31,7 +31,7 @@
 
 #include "fanet_struct.h"
 
-const char *holfuyUrlFormat = "http://api.holfuy.com/live/?s=%s&pw=XXXXXXXXXXX>";
+const char *holfuyUrlFormat = "http://api.holfuy.com/live/?s=%s&pw=%s>";
 
 sWeather hf711_weather;
 sWeather hf795_weather;
