@@ -262,7 +262,7 @@ void type_4_service_coder (sRawMessage *_tx_message, sWeather *_weather_data)
 	_seconds = time(NULL);
 	_seconds -= MAX_OLD_WEATHER_DATA;
 
-	// Checks if weahter date are not older than MAX_OLD_WEATHER_DATA
+	// Checks if weather date are not older than MAX_OLD_WEATHER_DATA
 	// If weather data are too old, don't fill data in
 	_tx_message->message[_tx_message->m_length] = 0;	
 	if (_seconds <= (_weather_data->time))
