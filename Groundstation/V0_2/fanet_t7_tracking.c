@@ -52,13 +52,13 @@ void decode_ground_type (sRawMessage *_rx_message, sGroundTracking *_tracking)
 	_tracking->ground_type = (_rx_message->message[_rx_message->m_pointer]&0xF0);
 	_tracking->ground_type >>=4;
 
-    strcpy(_tracking->ground_type_char, "----------------");
 	switch (_tracking->ground_type){
 		case  0:  strcpy (_tracking->ground_type_char, "Other"); break;
 		case  1:  strcpy (_tracking->ground_type_char, "Walking"); break;
 		case  2:  strcpy (_tracking->ground_type_char, "Vehicle"); break;
 		case  3:  strcpy (_tracking->ground_type_char, "Bike"); break;
 		case  4:  strcpy (_tracking->ground_type_char, "Boat"); break;
+        case  7:  strcpy (_tracking->ground_type_char, "Ground Station"); break;
         case  8:  strcpy (_tracking->ground_type_char, "Need a ride"); break;
         case  9:  strcpy (_tracking->ground_type_char, "Landed well"); break;
         case 12:  strcpy (_tracking->ground_type_char, "Need technical support"); break;
@@ -93,9 +93,6 @@ void type_7_tracking_decoder (sRawMessage *_rx_payload, sGroundTracking *_rx_tra
 
 void type_7_tracking_coder (sRawMessage *_tx_message, sTRACKING *_tx_tracking)
 {
-/* Not implemented yet
- * 
-*/
 }
 
 

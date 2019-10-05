@@ -246,7 +246,7 @@ void get_weather_data(sWeather *_weather_data)
 {
 //	sql_get_weather_values (conn, res, row, _weather_data);
 // get dynamic weather data or dummy
-    if (0 == strcmp(_weather_data->id_station, "GER-4217")) {
+    if (0 == strcmp(_weather_data->id_station, "4217")) {
         _weather_data->wind = true;
         _weather_data->wind_speed   = 42.0;
         _weather_data->wind_gusts   = 88.0;
@@ -258,7 +258,7 @@ void get_weather_data(sWeather *_weather_data)
         _weather_data->barom        = false;
         _weather_data->humid        = false;
         // Todo:    _weather_data->time
-    } else if (0 == strcmp(_weather_data->id_station, "HF711")) {
+    } else if (0 == strcmp(_weather_data->id_station, "H711")) {
         _weather_data->wind         = true;
         _weather_data->wind_speed   = 11.0;
         _weather_data->wind_gusts   = 19.11;
@@ -266,7 +266,7 @@ void get_weather_data(sWeather *_weather_data)
 
         _weather_data->temp         = true;
         _weather_data->temperature  = 7.11;
-    } else if (0 == strcmp(_weather_data->id_station, "HF795")) {
+    } else if (0 == strcmp(_weather_data->id_station, "H795")) {
         _weather_data->wind         = true;
         _weather_data->wind_speed   = 7.95;
         _weather_data->wind_gusts   = 21.0;
@@ -291,31 +291,27 @@ void get_weather_data(sWeather *_weather_data)
 void get_weather_station(const char* _station_id, sWeather *_weather_data)
 {
 //	sql_get_weather_station (conn, res, row, _weather_data);
-    if (0 == strcmp(_station_id, "GER-4217")) {
+    if (0 == strcmp(_station_id, "4217")) {
         // GER - Dummy
         strcpy (_weather_data->name, "GS:Germersche/Palz");
-        strcpy (_weather_data->short_name, "GS:GERPLZ");
-        _weather_data->longitude =  8.224818;
-        _weather_data->latitude  = 49.131702;
+        strcpy (_weather_data->short_name, "GS-G");
+        _weather_data->longitude =  8.37;
+        _weather_data->latitude  = 49.22;
         _weather_data->altitude  = 117;
-    } else if (0 == strcmp(_station_id, "HF711")) {
+    } else if (0 == strcmp(_station_id, "H711")) {
         // https://holfuy.com/de/map/la=49.20255&lo=8.00506&z=14
         strcpy (_weather_data->name, "Holfuy-WS 711 - Hohenberg/Pfalz");
-        strcpy (_weather_data->short_name, "WS711:Hohe");
-//        _weather_data->longitude =  8.00506;
-//        _weather_data->latitude  = 49.20255;
-        _weather_data->longitude =  8.23;
-        _weather_data->latitude  = 49.14;
-        _weather_data->altitude  = 111;
-    } else if (0 == strcmp(_station_id, "HF795")) {
+        strcpy (_weather_data->short_name, "W711:Hohe");
+        _weather_data->longitude =  8.00506;
+        _weather_data->latitude  = 49.20255;
+        _weather_data->altitude  = 565;
+    } else if (0 == strcmp(_station_id, "H795")) {
         // https://holfuy.com/de/map/la=49.23716&lo=8.02495&z=14
         strcpy (_weather_data->name, "Holfuy-WS 795 - Orensberg/Pfalz");
-        strcpy (_weather_data->short_name, "WS795:Ori");
-//        _weather_data->longitude =  8.02495;
-//        _weather_data->latitude  = 49.23716;
-        _weather_data->longitude =  8.22;
-        _weather_data->latitude  = 49.13;
-        _weather_data->altitude  = 95;
+        strcpy (_weather_data->short_name, "W795:Ori");
+        _weather_data->longitude =  8.02495;
+        _weather_data->latitude  = 49.23716;
+        _weather_data->altitude  = 555;
     } else {
         printf("ID: %s\n", _station_id);
         strcpy (_weather_data->id_station, _station_id);

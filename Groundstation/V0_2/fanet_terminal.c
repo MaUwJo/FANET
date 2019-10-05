@@ -303,7 +303,7 @@ void terminal_message_1 (boolean _rxtx, boolean _integrity, sRadioData *_radioda
 	terminal_rf_info (_rxtx, _integrity, _radiodata, _mac_data);
 	terminal_mac_info (_rxtx, _integrity, _radiodata, _mac_data);
 
-	// Latitude
+    // Latitude
 	if (_rxtx) printf(KCYN); else printf(KGRN);
 	if (_radiodata->crc_err) printf(KYEL);
 	printf(" %+9.5f°",_tracking->latitude);
@@ -326,6 +326,7 @@ void terminal_message_1 (boolean _rxtx, boolean _integrity, sRadioData *_radioda
 	if (_radiodata->crc_err) printf(KYEL);
 	printf("    %d",_tracking->aircraft_type);
 	printf (KNRM); printf("|");
+    printf(" %s |",_tracking->aircraft_type_char);
 
 	// Altitude
 	if (_rxtx) printf(KCYN); else printf(KGRN);
@@ -521,6 +522,7 @@ void terminal_message_7 (boolean _rxtx, boolean _integrity, sRadioData *_radioda
         case  3:
         case  4:
             printf(KGRN); break;
+        case  7:                    // Ground station
         case  8:
             printf(KYEL); break;
         case  9:
@@ -538,7 +540,7 @@ void terminal_message_7 (boolean _rxtx, boolean _integrity, sRadioData *_radioda
     printf("|");
     printf(" %s ",_tracking->ground_type_char);
     printf("|");
-    printf(KGRN);
+    printf(KWHT);
     printf("\n");
 }
 

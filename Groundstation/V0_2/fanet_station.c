@@ -69,6 +69,27 @@ enum { SF7=7, SF8, SF9, SF10, SF11, SF12 };
 byte sf = SF7;
 
 
+// Configure the Weather Stations (In a next Version: Better solution to read out a SQL databench)
+const char * stations_id [] = {
+        "4217", // GER Dummy
+        "H711",    // Holfuy Hohenberg
+        "H795"     // Holfuy Orensberg
+};
+#define N_STATIONS (sizeof (stations_id) / sizeof (const char *))
+
+const byte source_manufacturer_id = 0xFC;
+const uint16_t source_unique_id [] = {0x9017,0x9711,0x9795};
+
+
+#define	START_OFFSET_DATA	4;				// Starts the first transmission of weather data after 4 sec. when the software has started
+#define START_OFFSET_NAME	8;				// Starts the first transmission of weather station name after 8 sec. when the software has started
+#define INTERVAL_DATA		10;				// Sends the next weather data in a 10 sec interval
+#define INTERVAL_NAME		30;				// Sends the next weather station name in a 30 sec interval
+
+#define MAX_OLD_WEATHER_DATA	1800;		// 1800 seconds = 30 min -> If weather data are older, they will not sended.
+
+boolean b_send_gti = false;                 // send groundtracking info for ground and weather stations
+
 void die(const char *s)
 {
     perror(s);
@@ -227,6 +248,131 @@ void receivepacket()
     }
 }
 
+void type_7_ground_tracking_coder (sRawMessage *_tx_message, sGroundTracking *_tracking)
+{
+// assume coordinates already encoded in _tx_message
+// ground
+    _tx_message->message[6] = ((_tracking->ground_type & 0x0F) << 4);
+    if (_tracking->tracking) {
+        _tx_message->message[6] |= 0x01;
+    }
+    _tx_message->m_length += 1;
+}
+
+void type_4_weather_2_ground_tracking_coder (sRawMessage *_tx_message, sWeather *_weather_data)
+{
+    for (int i=0; i<255; i++) { _tx_message->message[i] = '\0'; };
+    code_abs_coordination (_tx_message, _weather_data);
+    sGroundTracking _tracking;
+    _tracking.tracking = true;
+    _tracking.ground_type = 7;  // Ground station
+    type_7_ground_tracking_coder(_tx_message, &_tracking);
+}
+
+
+void fanet_service_scheduler (void)
+{
+    sRadioData			_radiodata;
+    sFanetMAC			_fanet_mac;
+    sFanetMAC			_fanet_mac_7;
+    sWeather			_tx_weather_data;
+    sWeather			_rx_weather_data;
+    sRawMessage			_tx_message;
+    sName				_tx_name;
+    sName				_rx_name;
+    static byte			_i_data = 0;
+    static byte			_i_name = 0;
+    static uint16_t		_data_timer = START_OFFSET_DATA;
+    static uint16_t		_name_timer = START_OFFSET_NAME;
+
+    _fanet_mac.e_header	= false;
+    _fanet_mac.forward	= false;
+    _fanet_mac.cast		= false;
+    _fanet_mac.signature_bit = false;
+    _fanet_mac.valid_bit = true;
+
+    //----
+    _fanet_mac_7.e_header	= false;
+    _fanet_mac_7.forward	= false;
+    _fanet_mac_7.cast		= false;
+    _fanet_mac_7.signature_bit = false;
+    _fanet_mac_7.valid_bit = true;
+    //----
+
+    if (!_data_timer)
+    {
+        _tx_message.m_length = 0;
+        _fanet_mac.type	= 4;
+        _fanet_mac.s_manufactur_id	= source_manufacturer_id;
+        _fanet_mac.s_unique_id		= source_unique_id[_i_data];
+
+        strcpy(_tx_weather_data.id_station, stations_id[_i_data]);
+
+        get_weather_station (stations_id[_i_data], &_tx_weather_data);
+        get_weather_data (&_tx_weather_data);
+        //printf("Longitude %f\n", _weather_data.longitude);
+        type_4_service_coder (&_tx_message, &_tx_weather_data);
+
+        fanet_mac_coder (&_radiodata, &_fanet_mac, &_tx_message);
+
+        // Monitor task
+        //terminal_message_raw (1,0, &_radiodata, &_fanet_mac, &_tx_message);
+        type_4_service_decoder (&_tx_message, &_rx_weather_data);
+        terminal_message_4 (true, false, &_radiodata, &_fanet_mac, &_rx_weather_data);
+
+        if (b_send_gti == true) {   // Send GroundTrackingInfo for WeatherStation
+            _fanet_mac_7.type	= 7;
+            _fanet_mac_7.s_manufactur_id	= source_manufacturer_id;
+            _fanet_mac_7.s_unique_id		= source_unique_id[_i_data];
+            _tx_message.m_length = 0;
+            type_4_weather_2_ground_tracking_coder(&_tx_message, &_tx_weather_data);
+            fanet_mac_coder (&_radiodata, &_fanet_mac_7, &_tx_message);
+
+            sGroundTracking	_rx_tracking;
+            type_7_tracking_decoder (&_tx_message, &_rx_tracking);
+            terminal_message_7 (0,0, &_radiodata, &_fanet_mac_7, &_rx_tracking);
+        }
+
+        _i_data++;
+        if (_i_data == N_STATIONS)
+            _i_data = 0;
+        _data_timer = INTERVAL_DATA;
+
+    }
+    _data_timer--;
+
+    if (!_name_timer)
+    {
+        _tx_message.m_length = 0;
+        _fanet_mac.type	= 2;
+        _fanet_mac.s_manufactur_id	= source_manufacturer_id;
+        _fanet_mac.s_unique_id		= source_unique_id[_i_name];
+
+        strcpy(_tx_weather_data.id_station, stations_id[_i_name]);
+
+        get_weather_station (stations_id[_i_name], &_tx_weather_data);
+
+        strcpy(_tx_name.name, _tx_weather_data.short_name);
+        _tx_name.n_length = strlen(_tx_name.name);
+
+        type_2_name_coder (&_tx_message, &_tx_name);
+
+        fanet_mac_coder (&_radiodata, &_fanet_mac, &_tx_message);
+
+        // Monitor task
+        //terminal_message_raw (1,0, &_radiodata, &_fanet_mac, &_tx_message);
+        type_2_name_decoder (&_tx_message, &_rx_name);
+        terminal_message_2 (true, false, &_radiodata, &_fanet_mac, &_rx_name);
+
+        _i_name++;
+        if (_i_name == N_STATIONS)
+            _i_name = 0;
+        _name_timer = INTERVAL_NAME;
+    }
+    _name_timer--;
+
+}
+
 sWeather this_station;
 sWeather *this_station_data = &this_station;
 
@@ -241,11 +387,19 @@ int main (int argc, char *argv[])
 	//char _minute_new;
 	//char _minute_old;
 
+	boolean listen_only = false;
+
     if (argc > 1) {
-        if (0==strcmp(argv[1], "db_init")) {
+        if (0==strcmp(argv[1], "-dbinit")) {
             db_init("FANET_Station.db");
             exit(0);
-        }
+        } else if (0==strcmp(argv[1], "-l")) {
+            listen_only = true;
+            printf("-- only listening --\n");
+        } else if (0==strcmp(argv[1], "-gti")) {
+            b_send_gti = true;
+            printf("-- Sending GTI --\n");
+    }
     }
     db_login("FANET_Station.db");
     get_station_parameters(this_station_data);
@@ -274,8 +428,11 @@ int main (int argc, char *argv[])
 		{
 		  _second_old = _second_new;
 
-		  fanet_t4_service_scheduler();
-		  fanet_t3_messenger_scheduler();
+		  if (listen_only == false) {
+
+              fanet_service_scheduler();
+              fanet_t3_messenger_scheduler();
+		  }
 
 		}
 

@@ -36,10 +36,10 @@
 
 #define	START_OFFSET_DATA	4;				// Starts the first transmission of weather data after 4 sec. when the software has started
 #define START_OFFSET_NAME	8;				// Starts the first transmission of weather station name after 8 sec. when the software has started
-#define INTERVAL_DATA		10;				// Sends the next weather data in a 10 sec interval
+#define INTERVAL_DATA		10;				// Sends the next weather data in a 10 sec interval TODO: configuration from weather stations
 #define INTERVAL_NAME		30;				// Sends the next weather station name in a 30 sec interval
 
-#define MAX_OLD_WEATHER_DATA	1800;		// 1800 seconds = 30 min -> If weather data are older, they will not sended.
+#define MAX_OLD_WEATHER_DATA	1800;		// 1800 seconds = 30 min -> If weather data are older, they will not sent.
 
 
 /*******************************************************************
@@ -74,9 +74,6 @@ void code_barometric (sRawMessage *_tx_message, sWeather *_weather_data);
 void type_4_service_decoder (sRawMessage *_rx_message, sWeather *_weather_data);
 
 void type_4_service_coder (sRawMessage *_tx_message, sWeather *_weather_data);
-
-
-void fanet_t4_service_scheduler (void);
 
 void type_4_service_receiver (sRadioData *_radiodata, sFanetMAC *_fanet_mac, sRawMessage *_rx_payload);
 

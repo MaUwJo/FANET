@@ -35,26 +35,6 @@
 #include "fanet_t4_service.h"
 
 
-// Configure the Weather Stations (In a next Version: Better solution to read out a SQL databench)
-const char * stations_id [] = {
-        "GER-4217", // GER Dummy
-        "HF711",    // Holfuy Hohenberg
-        "HF795"     // Holfuy Orensberg
-};
-#define N_STATIONS (sizeof (stations_id) / sizeof (const char *))
-
-const byte source_manufacturer_id = 0xFC;
-const uint16_t source_unique_id [] = {0x9017,0x9711,0x9795};
-
-
-#define	START_OFFSET_DATA	4;				// Starts the first transmission of weather data after 4 sec. when the software has started
-#define START_OFFSET_NAME	8;				// Starts the first transmission of weather station name after 8 sec. when the software has started
-#define INTERVAL_DATA		10;				// Sends the next weather data in a 10 sec interval
-#define INTERVAL_NAME		30;				// Sends the next weather station name in a 30 sec interval
-
-#define MAX_OLD_WEATHER_DATA	1800;		// 1800 seconds = 30 min -> If weather data are older, they will not sended.
-
-
 /*******************************************************************
  * Temperature (+1byte in 0.5 degree, 2-Complement) 
  * ****************************************************************/
@@ -251,127 +231,45 @@ void type_4_service_decoder (sRawMessage *_rx_message, sWeather *_weather_data)
 
 	if (_rx_message->message[0]&0x08)
 		decode_barometric (_rx_message, _weather_data);
-	
 
 }
+
 
 void type_4_service_coder (sRawMessage *_tx_message, sWeather *_weather_data)
 {
-	time_t _seconds;
-		
-	_seconds = time(NULL);
-	_seconds -= MAX_OLD_WEATHER_DATA;
+    time_t _seconds;
 
-	// Checks if weather date are not older than MAX_OLD_WEATHER_DATA
-	// If weather data are too old, don't fill data in
-	_tx_message->message[_tx_message->m_length] = 0;	
-	if (_seconds <= (_weather_data->time))
-	{
-		if (_weather_data->temp) _tx_message->message[_tx_message->m_length] |= 0x40;
-		if (_weather_data->wind) _tx_message->message[_tx_message->m_length] |= 0x20;
-		if (_weather_data->humid) _tx_message->message[_tx_message->m_length] |= 0x10;
-		if (_weather_data->barom) _tx_message->message[_tx_message->m_length] |= 0x08;
-	}
-	_tx_message->m_length += 1;
+    _seconds = time(NULL);
+    _seconds -= MAX_OLD_WEATHER_DATA;
 
-	code_abs_coordination (_tx_message, _weather_data);
+    // Checks if weather date are not older than MAX_OLD_WEATHER_DATA
+    // If weather data are too old, don't fill data in
+    _tx_message->message[_tx_message->m_length] = 0;
+    if (_seconds <= (_weather_data->time))
+    {
+        if (_weather_data->temp) _tx_message->message[_tx_message->m_length] |= 0x40;
+        if (_weather_data->wind) _tx_message->message[_tx_message->m_length] |= 0x20;
+        if (_weather_data->humid) _tx_message->message[_tx_message->m_length] |= 0x10;
+        if (_weather_data->barom) _tx_message->message[_tx_message->m_length] |= 0x08;
+    }
+    _tx_message->m_length += 1;
 
-	if (_seconds <= (_weather_data->time))
-	{
-		if (_weather_data->temp)
-			code_temperature (_tx_message, _weather_data);
-	
-		if (_weather_data->wind)
-			code_wind (_tx_message, _weather_data); 		
-	
-		if (_weather_data->humid)
-			code_humidity (_tx_message, _weather_data);
+    code_abs_coordination (_tx_message, _weather_data);
 
-		if (_weather_data->barom)
-			code_barometric (_tx_message, _weather_data);
-	}
-}
+    if (_seconds <= (_weather_data->time))
+    {
+        if (_weather_data->temp)
+            code_temperature (_tx_message, _weather_data);
 
+        if (_weather_data->wind)
+            code_wind (_tx_message, _weather_data);
 
-void fanet_t4_service_scheduler (void)
-{
-	sRadioData			_radiodata;
-	sFanetMAC			_fanet_mac;
-	sWeather			_tx_weather_data;
-	sWeather			_rx_weather_data;
-	sRawMessage			_tx_message;
-	sName				_tx_name;
-	sName				_rx_name;
-	static byte			_i_data = 0;
-	static byte			_i_name = 0;
-	static uint16_t		_data_timer = START_OFFSET_DATA;
-	static uint16_t		_name_timer = START_OFFSET_NAME;
-	
-	_fanet_mac.e_header	= false;
-	_fanet_mac.forward	= false;
-	_fanet_mac.cast		= false;
-	_fanet_mac.signature_bit = false;
-	_fanet_mac.valid_bit = true;
-	
-	
-	if (!_data_timer)
-	{
-		_tx_message.m_length = 0;
-		_fanet_mac.type	= 4;
-		_fanet_mac.s_manufactur_id	= source_manufacturer_id;
-		_fanet_mac.s_unique_id		= source_unique_id[_i_data];
-		
-		strcpy(_tx_weather_data.id_station, stations_id[_i_data]);
+        if (_weather_data->humid)
+            code_humidity (_tx_message, _weather_data);
 
-		get_weather_station (stations_id[_i_data], &_tx_weather_data);
-		get_weather_data (&_tx_weather_data);
-		//printf("Longitude %f\n", _weather_data.longitude);
-		type_4_service_coder (&_tx_message, &_tx_weather_data);
-		
-		fanet_mac_coder (&_radiodata, &_fanet_mac, &_tx_message);
-
-		// Monitor task
-		//terminal_message_raw (1,0, &_radiodata, &_fanet_mac, &_tx_message);
-		type_4_service_decoder (&_tx_message, &_rx_weather_data);
-		terminal_message_4 (true, false, &_radiodata, &_fanet_mac, &_rx_weather_data);
-		
-		_i_data++;
-		if (_i_data == N_STATIONS)
-			_i_data = 0;
-		_data_timer = INTERVAL_DATA;
-	}
-	_data_timer--;
-
-	if (!_name_timer)
-	{
-		_tx_message.m_length = 0;
-		_fanet_mac.type	= 2;
-		_fanet_mac.s_manufactur_id	= source_manufacturer_id;
-		_fanet_mac.s_unique_id		= source_unique_id[_i_name];
-		
-		strcpy(_tx_weather_data.id_station, stations_id[_i_name]);
-
-		get_weather_station (stations_id[_i_name], &_tx_weather_data);
-		
-		strcpy(_tx_name.name, _tx_weather_data.short_name);
-		_tx_name.n_length = strlen(_tx_name.name);
-		
-		type_2_name_coder (&_tx_message, &_tx_name);
-
-		fanet_mac_coder (&_radiodata, &_fanet_mac, &_tx_message);
-
-		// Monitor task
-		//terminal_message_raw (1,0, &_radiodata, &_fanet_mac, &_tx_message);
-		type_2_name_decoder (&_tx_message, &_rx_name);
-		terminal_message_2 (true, false, &_radiodata, &_fanet_mac, &_rx_name);
-		
-		_i_name++;
-		if (_i_name == N_STATIONS)
-			_i_name = 0;
-		_name_timer = INTERVAL_NAME;
-	}
-	_name_timer--;
-	
+        if (_weather_data->barom)
+            code_barometric (_tx_message, _weather_data);
+    }
 }
 
 void type_4_service_receiver (sRadioData *_radiodata, sFanetMAC *_fanet_mac, sRawMessage *_rx_payload)
