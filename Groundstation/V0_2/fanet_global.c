@@ -89,7 +89,7 @@ double rad2deg(double rad) {
 	(Note: 32bit floating point is required for direct conversion)
 
  ***********************************************************************/
-void decode_abs_coordination (char _input[], float *_latitude, float *_longitude)
+void decode_abs_coordinates (char *_input, float *_latitude, float *_longitude)
 {
 	signed int	latitude_int;
 	signed int	longitude_int;
@@ -109,33 +109,34 @@ void decode_abs_coordination (char _input[], float *_latitude, float *_longitude
 	*_longitude = longitude_int/(float)46603;
 }
 
-void code_abs_coordination (sRawMessage *_tx_message, sWeather *_weather_data)
+
+void encode_abs_coordinates (sRawMessage *_tx_message, float _latitude, float _longitude)
 {
-	signed int	_latitude_int;
-	signed int	_longitude_int;
+    signed int	_latitude_int;
+    signed int	_longitude_int;
 
-	if (_weather_data->latitude > 90)
-		_weather_data->latitude = 0;
-	if (_weather_data->latitude < -90)
-		_weather_data->latitude = 0;
+    if (_latitude > 90)
+        _latitude = 0;
+    if (_latitude < -90)
+        _latitude = 0;
 
-	if (_weather_data->longitude > 180)
-		_weather_data->longitude = 0;
-	if (_weather_data->longitude < -180)
-		_weather_data->longitude = 0;
+    if (_longitude > 180)
+        _longitude = 0;
+    if (_longitude < -180)
+        _longitude = 0;
 
-	_latitude_int  = round(_weather_data->latitude*93206);
-	_longitude_int = round(_weather_data->longitude*46603);
+    _latitude_int  = round(_latitude*93206);
+    _longitude_int = round(_longitude*46603);
 
-	_tx_message->message[_tx_message->m_length]   = _latitude_int&0x000000FF;
-	_tx_message->message[_tx_message->m_length+1] = (_latitude_int&0x0000FF00)>>8;
-	_tx_message->message[_tx_message->m_length+2] = (_latitude_int&0x00FF0000)>>16;
+    _tx_message->message[_tx_message->m_length]   = _latitude_int&0x000000FF;
+    _tx_message->message[_tx_message->m_length+1] = (_latitude_int&0x0000FF00)>>8;
+    _tx_message->message[_tx_message->m_length+2] = (_latitude_int&0x00FF0000)>>16;
 
-	_tx_message->message[_tx_message->m_length+3] = _longitude_int&0x000000FF;
-	_tx_message->message[_tx_message->m_length+4] = (_longitude_int&0x0000FF00)>>8;
-	_tx_message->message[_tx_message->m_length+5] = (_longitude_int&0x00FF0000)>>16;
+    _tx_message->message[_tx_message->m_length+3] = _longitude_int&0x000000FF;
+    _tx_message->message[_tx_message->m_length+4] = (_longitude_int&0x0000FF00)>>8;
+    _tx_message->message[_tx_message->m_length+5] = (_longitude_int&0x00FF0000)>>16;
 
-	_tx_message->m_length += 6;
+    _tx_message->m_length += 6;
 }
 
 

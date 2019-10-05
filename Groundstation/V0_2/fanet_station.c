@@ -262,7 +262,7 @@ void type_7_ground_tracking_coder (sRawMessage *_tx_message, sGroundTracking *_t
 void type_4_weather_2_ground_tracking_coder (sRawMessage *_tx_message, sWeather *_weather_data)
 {
     for (int i=0; i<255; i++) { _tx_message->message[i] = '\0'; };
-    code_abs_coordination (_tx_message, _weather_data);
+    encode_abs_coordinates (_tx_message, _weather_data->latitude, _weather_data->longitude);
     sGroundTracking _tracking;
     _tracking.tracking = true;
     _tracking.ground_type = 7;  // Ground station

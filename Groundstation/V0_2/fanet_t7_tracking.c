@@ -76,8 +76,8 @@ void type_7_tracking_decoder (sRawMessage *_rx_payload, sGroundTracking *_rx_tra
 	float _longitude;
 	
 	_rx_payload->m_pointer = 0;
-	
-	decode_abs_coordination (&_rx_payload->message[_rx_payload->m_pointer], &_latitude, &_longitude);
+
+    decode_abs_coordinates(&_rx_payload->message[_rx_payload->m_pointer], &_latitude, &_longitude);
 	_rx_tracking->latitude  = _latitude;
 	_rx_tracking->longitude = _longitude;
 	_rx_payload->m_pointer += 6;

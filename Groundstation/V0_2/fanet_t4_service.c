@@ -214,8 +214,8 @@ void type_4_service_decoder (sRawMessage *_rx_message, sWeather *_weather_data)
 
 	if (_rx_message->message[0]&0x01)		// Bit E-Header is set
 		_rx_message->m_pointer += 1;
-		
-	decode_abs_coordination (&_rx_message->message[_rx_message->m_pointer], &_latitude, &_longitude);
+
+    decode_abs_coordinates(&_rx_message->message[_rx_message->m_pointer], &_latitude, &_longitude);
 	_weather_data->latitude  = _latitude;
 	_weather_data->longitude = _longitude;
 	_rx_message->m_pointer += 6;
@@ -254,7 +254,7 @@ void type_4_service_coder (sRawMessage *_tx_message, sWeather *_weather_data)
     }
     _tx_message->m_length += 1;
 
-    code_abs_coordination (_tx_message, _weather_data);
+    encode_abs_coordinates (_tx_message, _weather_data->longitude, _weather_data->latitude);
 
     if (_seconds <= (_weather_data->time))
     {

@@ -38,9 +38,9 @@ double rad2deg(double);
 
 double distance(double lat1, double lon1, double lat2, double lon2, char unit);
 
-void decode_abs_coordination (char _input[], float *_latitude, float *_longitude);
+void decode_abs_coordinates (char *_input, float *_latitude, float *_longitude);
 
-void code_abs_coordination (sRawMessage *_tx_message, sWeather *_weather_data);
+void encode_abs_coordinates (sRawMessage *_tx_message, float _latitude, float _longitude);
 
 void address_int (char *_address_string, byte *_manuf, uint16_t *_id);
 

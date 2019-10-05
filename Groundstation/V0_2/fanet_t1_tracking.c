@@ -120,8 +120,8 @@ void type_1_tracking_decoder (sRawMessage *_rx_payload, sTRACKING *_rx_tracking)
 	float _longitude;
 	
 	_rx_payload->m_pointer = 0;
-	
-	decode_abs_coordination (&_rx_payload->message[_rx_payload->m_pointer], &_latitude, &_longitude);
+
+    decode_abs_coordinates(&_rx_payload->message[_rx_payload->m_pointer], &_latitude, &_longitude);
 	_rx_tracking->latitude  = _latitude;
 	_rx_tracking->longitude = _longitude;
 	_rx_payload->m_pointer += 6;
@@ -142,6 +142,8 @@ void type_1_tracking_decoder (sRawMessage *_rx_payload, sTRACKING *_rx_tracking)
 
 void type_1_tracking_coder (sRawMessage *_tx_message, sTRACKING *_tx_tracking)
 {
+    // for completeness
+
 /* Not implemented yet
  * 
 int type_1_tracking (void)
