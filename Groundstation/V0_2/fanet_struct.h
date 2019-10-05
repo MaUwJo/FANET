@@ -104,22 +104,36 @@ typedef unsigned char byte;
 
 #ifndef __typedef_TRACKING
 #	define __typedef_TRACKING
+typedef struct {
+    byte		s_address_manufactur_id;
+    uint16_t	s_address_unique_id;
+    float		latitude;
+    float		longitude;
+    boolean		tracking;
+    byte		aircraft_type;
+    char		aircraft_type_char[16];
+    uint16_t	altitude;
+    float		speed;
+    float		climb;
+    float 		heading;
+    boolean		turn_rate_on;
+    float 		turn_rate;
+    float		distance;
+}sTRACKING;
+#endif
+
+#ifndef __typedef_GROUND_TRACKING
+#	define __typedef_GROUND_TRACKING
 	typedef struct {
 		byte		s_address_manufactur_id;
 		uint16_t	s_address_unique_id;
 		float		latitude;
 		float		longitude;
-		boolean		tracking;
-		byte		aircraft_type;
-		char		aircraft_type_char[16];
-		uint16_t	altitude;
-		float		speed;
-		float		climb;
-		float 		heading;
-		boolean		turn_rate_on;
-		float 		turn_rate;
-		float		distance;		
-	}sTRACKING;
+        boolean		tracking;
+		byte		ground_type;
+		char		ground_type_char[20];
+        float		distance;
+	}sGroundTracking;
 #endif
 
 #ifndef __typedef_MESSAGE

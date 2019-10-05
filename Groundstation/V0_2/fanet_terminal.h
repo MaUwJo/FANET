@@ -48,6 +48,6 @@ void terminal_message_3 (boolean _rxtx, boolean _integrity, sRadioData *_radioda
 
 void terminal_message_4 (boolean _rxtx, boolean _integrity, sRadioData *_radiodata, sFanetMAC *_mac_data, sWeather *_weather_data);
 
-void terminal_message_7 (boolean _rxtx, boolean _integrity, sRadioData *_radiodata, sFanetMAC *_mac_data, sTRACKING *_tracking);
+void terminal_message_7 (boolean _rxtx, boolean _integrity, sRadioData *_radiodata, sFanetMAC *_mac_data, sGroundTracking *_tracking);
 
 #endif

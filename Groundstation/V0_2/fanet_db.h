@@ -41,6 +41,7 @@ void write_system_data_1min (sSystem *_system_data);
 void write_system_data_15min (sSystem *_system_data);
 
 void write_object_tracking (sRadioData *_radiodata, sFanetMAC *_fanet_mac, sTRACKING *_tracking);
+void write_object_ground_tracking (sRadioData *_radiodata, sFanetMAC *_fanet_mac, sGroundTracking *_tracking);
 
 void write_object_name (sRadioData *_radiodata, sFanetMAC *_fanet_mac, sName *_name);
 

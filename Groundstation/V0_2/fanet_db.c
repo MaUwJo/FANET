@@ -248,9 +248,9 @@ void get_weather_data(sWeather *_weather_data)
 // get dynamic weather data or dummy
     if (0 == strcmp(_weather_data->id_station, "GER-4217")) {
         _weather_data->wind = true;
-        _weather_data->wind_speed   = 17.0;
-        _weather_data->wind_gusts   = 42.0;
-        _weather_data->wind_heading = 135.17;
+        _weather_data->wind_speed   = 42.0;
+        _weather_data->wind_gusts   = 88.0;
+        _weather_data->wind_heading = 271.17;
 
         _weather_data->temp         = true;
         _weather_data->temperature  = 17.42;
@@ -297,21 +297,25 @@ void get_weather_station(const char* _station_id, sWeather *_weather_data)
         strcpy (_weather_data->short_name, "GS:GERPLZ");
         _weather_data->longitude =  8.224818;
         _weather_data->latitude  = 49.131702;
-        _weather_data->altitude  = 111;
+        _weather_data->altitude  = 117;
     } else if (0 == strcmp(_station_id, "HF711")) {
         // https://holfuy.com/de/map/la=49.20255&lo=8.00506&z=14
         strcpy (_weather_data->name, "Holfuy-WS 711 - Hohenberg/Pfalz");
         strcpy (_weather_data->short_name, "WS711:Hohe");
-        _weather_data->longitude =  8.00506;
-        _weather_data->latitude  = 49.20255;
+//        _weather_data->longitude =  8.00506;
+//        _weather_data->latitude  = 49.20255;
+        _weather_data->longitude =  8.23;
+        _weather_data->latitude  = 49.14;
         _weather_data->altitude  = 111;
     } else if (0 == strcmp(_station_id, "HF795")) {
         // https://holfuy.com/de/map/la=49.23716&lo=8.02495&z=14
         strcpy (_weather_data->name, "Holfuy-WS 795 - Orensberg/Pfalz");
         strcpy (_weather_data->short_name, "WS795:Ori");
-        _weather_data->longitude =  8.02495;
-        _weather_data->latitude  = 49.23716;
-        _weather_data->altitude  = 111;
+//        _weather_data->longitude =  8.02495;
+//        _weather_data->latitude  = 49.23716;
+        _weather_data->longitude =  8.22;
+        _weather_data->latitude  = 49.13;
+        _weather_data->altitude  = 95;
     } else {
         printf("ID: %s\n", _station_id);
         strcpy (_weather_data->id_station, _station_id);
@@ -336,6 +340,11 @@ void write_system_data_15min (sSystem *_system_data)
 
 
 void write_object_tracking (sRadioData *_radiodata, sFanetMAC *_fanet_mac, sTRACKING *_tracking)
+{
+//	sql_write_tracking_data (conn, res, row, _radiodata, _fanet_mac, _tracking);
+}
+
+void write_object_ground_tracking (sRadioData *_radiodata, sFanetMAC *_fanet_mac, sGroundTracking *_tracking)
 {
 //	sql_write_tracking_data (conn, res, row, _radiodata, _fanet_mac, _tracking);
 }

@@ -198,7 +198,8 @@ void terminal_mac_info (boolean _rxtx, boolean _integrity, sRadioData *_radiodat
 void terminal_message_raw (boolean _rxtx, boolean _integrity, sRadioData *_radiodata, sFanetMAC *_mac_data, sRawMessage *_raw_message)
 {
 	terminal_rf_info (_rxtx, _integrity, _radiodata, _mac_data);
-	//terminal_mac_info (_rxtx, _integrity, _mac_data); 
+	//terminal_mac_info (_rxtx, _integrity, _mac_data);
+ 
 
 	// Raw Data
 	if (_rxtx) printf(KCYN); else printf(KGRN);
@@ -486,7 +487,8 @@ void terminal_message_4 (boolean _rxtx, boolean _integrity, sRadioData *_radioda
  * ---------------------------------------------------------------------
  * 0.3 |28.09.2019|  mr  | Init Version
  **********************************************************************/
-void terminal_message_7 (boolean _rxtx, boolean _integrity, sRadioData *_radiodata, sFanetMAC *_mac_data, sTRACKING *_tracking)
+void terminal_message_7 (boolean _rxtx, boolean _integrity, sRadioData *_radiodata, sFanetMAC *_mac_data,
+        sGroundTracking *_tracking)
 {
 	terminal_rf_info (_rxtx, _integrity, _radiodata, _mac_data);
 	terminal_mac_info (_rxtx, _integrity, _radiodata, _mac_data);
@@ -509,14 +511,33 @@ void terminal_message_7 (boolean _rxtx, boolean _integrity, sRadioData *_radioda
 	printf(" %d",_tracking->tracking);
 	printf (KNRM); printf("|");
 
-	// Aircraft type
+	// Ground type
 	if (_rxtx) printf(KCYN); else printf(KGRN);
 	if (_radiodata->crc_err) printf(KYEL);
-	printf("    %d",_tracking->aircraft_type);
-	printf (KNRM); printf("|");
-
-	printf("\n");
-
+	switch (_tracking->ground_type) {
+        case  0:
+        case  1:
+        case  2:
+        case  3:
+        case  4:
+            printf(KGRN); break;
+        case  8:
+            printf(KYEL); break;
+        case 12:
+        case 13:
+        case 14:
+            printf(KRED); break;
+        case 15:
+            printf(KMAG); break;
+        default:
+            printf(KGRN); break;
+	}
+    printf("    %d",_tracking->ground_type);
+    printf("|");
+    printf(" %s ",_tracking->ground_type_char);
+    printf("|");
+    printf(KGRN);
+    printf("\n");
 }
 
 
