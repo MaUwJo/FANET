@@ -59,7 +59,8 @@ void decode_ground_type (sRawMessage *_rx_message, sGroundTracking *_tracking)
 		case  2:  strcpy (_tracking->ground_type_char, "Vehicle"); break;
 		case  3:  strcpy (_tracking->ground_type_char, "Bike"); break;
 		case  4:  strcpy (_tracking->ground_type_char, "Boat"); break;
-		case  8:  strcpy (_tracking->ground_type_char, "Need a ride"); break;
+        case  8:  strcpy (_tracking->ground_type_char, "Need a ride"); break;
+        case  9:  strcpy (_tracking->ground_type_char, "Landed well"); break;
         case 12:  strcpy (_tracking->ground_type_char, "Need technical support"); break;
         case 13:  strcpy (_tracking->ground_type_char, "Need medical support"); break;
         case 14:  strcpy (_tracking->ground_type_char, "Distress call"); break;

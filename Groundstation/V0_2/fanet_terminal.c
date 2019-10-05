@@ -523,6 +523,8 @@ void terminal_message_7 (boolean _rxtx, boolean _integrity, sRadioData *_radioda
             printf(KGRN); break;
         case  8:
             printf(KYEL); break;
+        case  9:
+            printf(KGRN); break;
         case 12:
         case 13:
         case 14:
