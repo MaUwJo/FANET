@@ -131,9 +131,18 @@ void decode_climb (sRawMessage *_rx_message, sTRACKING *_tracking)
 
 void decode_heading (sRawMessage *_rx_message, sTRACKING *_tracking)
 {
-	_tracking->heading = 360.0/256*(_rx_message->message[_rx_message->m_pointer]);	// Return range will be 0...360° in 1.4° steps
+    _tracking->heading = 360.0/256*(_rx_message->message[_rx_message->m_pointer]);	// Return range will be 0...360° in 1.4° steps
 
-	_rx_message->m_pointer += 1;
+    _rx_message->m_pointer += 1;
+}
+
+void encode_heading (sRawMessage *_tx_message, sTRACKING *_tracking)
+{
+//    _tracking->heading = 360.0/256*(
+    int heading = (_tracking->heading * 256 / 360);
+    _tx_message->message[10] = heading;	//  0...360° in 1.4° steps
+
+    _tx_message->m_pointer += 1;
 }
 
 
@@ -176,7 +185,8 @@ void type_1_tracking_coder (sRawMessage *_tx_message, sTRACKING *_tx_tracking)
     encode_alitude(_tx_message, _tx_tracking);
     _tx_message->message[7] |= (_tx_tracking->aircraft_type << 4);
     encode_speed(_tx_message, _tx_tracking);
-    
+    encode_heading(_tx_message, _tx_tracking);
+
     _tx_message->m_length = 15;
 /*
     _tx_message->message[ 9] = 0x00;    // Climb
