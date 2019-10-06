@@ -41,6 +41,7 @@ void decode_tracking (sRawMessage *_rx_message, sTRACKING *_tracking);
 void decode_aircraft_type (sRawMessage *_rx_message, sTRACKING *_tracking);
 
 void decode_alitude (sRawMessage *_rx_message, sTRACKING *_tracking);
+void encode_alitude (sRawMessage *_sx_message, sTRACKING *_tracking);
 
 void decode_speed (sRawMessage *_rx_message, sTRACKING *_tracking);
 

@@ -69,13 +69,26 @@ void decode_aircraft_type (sRawMessage *_rx_message, sTRACKING *_tracking)
 
 void decode_alitude (sRawMessage *_rx_message, sTRACKING *_tracking)
 {
-	_tracking->altitude = (_rx_message->message[_rx_message->m_pointer+1]&0x07);
-	_tracking->altitude <<= 8;
-	_tracking->altitude |= _rx_message->message[_rx_message->m_pointer];	// Return range will be 0...2'047 m in 1 m steps
-	if ((_rx_message->message[_rx_message->m_pointer+1] & 0x08))
-		_tracking->altitude <<= 2;											// Return range will be 2'047...8'188 m in 4 m steps
+    _tracking->altitude = (_rx_message->message[_rx_message->m_pointer+1]&0x07);
+    _tracking->altitude <<= 8;
+    _tracking->altitude |= _rx_message->message[_rx_message->m_pointer];	// Return range will be 0...2'047 m in 1 m steps
+    if ((_rx_message->message[_rx_message->m_pointer+1] & 0x08))
+        _tracking->altitude <<= 2;											// Return range will be 2'047...8'188 m in 4 m steps
 
-	_rx_message->m_pointer += 2;			
+    _rx_message->m_pointer += 2;
+}
+
+void encode_alitude (sRawMessage *_tx_message, sTRACKING *_tracking)
+{
+    signed int altitude = _tracking->altitude & 0x07ff;;
+    if (_tracking->altitude >= 2048) {
+        altitude = _tracking->altitude / 4;
+        _tx_message->message[_tx_message->m_length+1] |= 0x08;	   // Set Altitude Scaling Bit: 1->4x;
+    }
+    _tx_message->message[_tx_message->m_length+1] |= (altitude >> 8 ) & 0x07;   // 7
+    _tx_message->message[_tx_message->m_length+0] =  (altitude & 0xFF);         // 6
+
+    _tx_message->m_length += 2;
 }
 
 void decode_speed (sRawMessage *_rx_message, sTRACKING *_tracking)
@@ -87,6 +100,16 @@ void decode_speed (sRawMessage *_rx_message, sTRACKING *_tracking)
 	_rx_message->m_pointer += 1;
 }
 
+void encode_speed (sRawMessage *_tx_message, sTRACKING *_tracking)
+{
+    int speed = _tracking->speed * 2;
+    if (_tracking->speed > 63.5) {
+        _tx_message->message[_tx_message->m_length] |= 0x80;    // Speed scaling bit
+        speed = _tracking->speed / 2.5; 
+    }
+    _tx_message->message[_tx_message->m_length] |= (speed & 0x7F);
+    _tx_message->m_length += 1;
+}
 
 void decode_climb (sRawMessage *_rx_message, sTRACKING *_tracking)
 {
@@ -142,58 +165,23 @@ void type_1_tracking_decoder (sRawMessage *_rx_payload, sTRACKING *_rx_tracking)
 
 void type_1_tracking_coder (sRawMessage *_tx_message, sTRACKING *_tx_tracking)
 {
-    // for completeness
+    // for completeness - though not needed for ground station code so far
+    // assume MAC date are already encoded in message buffer
 
-/* Not implemented yet
- * 
-int type_1_tracking (void)
-{
+    for (int i=0; i<255; i++) { _tx_message->message[i] = '\0'; };
+    _tx_message->m_length = 0;
+    _tx_message->m_pointer = 0;
 
-	signed int	latitude_int;
-	signed int	longitude_int;
-	signed int	altitude;
-	
-	message_tx[0] = 0x01;
-	message_tx[1] = STATION_MANUF;
-	message_tx[2] = STATION_ID&0x00FF;
-	message_tx[3] = (STATION_ID&0xFF00)>>8;
-	//message_tx[4] = 0x00;
-	
-	latitude_int  = STATION_LAT*93206;
-	longitude_int = STATION_LON*46603;
-	
-	printf("%d  %d\n",latitude_int, longitude_int);
-	
-	message_tx[4] = latitude_int&0x000000FF;
-	message_tx[5] = (latitude_int&0x0000FF00)>>8;
-	message_tx[6] = (latitude_int&0x00FF0000)>>16;
-
-	message_tx[7] = longitude_int&0x000000FF;
-	message_tx[8] = (longitude_int&0x0000FF00)>>8;
-	message_tx[9] = (longitude_int&0x00FF0000)>>16;
-
-	if (STATION_ALT < 2048)
-		altitude = STATION_ALT;
-	else
-	{
-		altitude = STATION_ALT/4;
-		printf("Alt: %d\n", altitude);
-	}	
-	message_tx[10] = STATION_ALT&0x00FF;
-	message_tx[11] = (STATION_ALT&0x0700)>>8;
-		
-	if (STATION_ALT > 2048)
-		message_tx[11] |= 0x08;			// Set Altitude Scaling Bit: 1->4x
-		
-		
-	message_tx[12] = 0x00;				// Speed
-	
-	message_tx[13] = 0x00;				// Climb
-	
-	message_tx[14] = 0x00;				// Heading
-	
-	return 15;
-}
+    encode_abs_coordinates (_tx_message, _tx_tracking->latitude, _tx_tracking->longitude);
+    encode_alitude(_tx_message, _tx_tracking);
+    _tx_message->message[7] |= (_tx_tracking->aircraft_type << 4);
+    encode_speed(_tx_message, _tx_tracking);
+    
+    _tx_message->m_length = 15;
+/*
+    _tx_message->message[ 9] = 0x00;    // Climb
+    _tx_message->message[10] = 0x00;	// Heading
+    _tx_message->message[11] = 0x00;	// Turn rate
 */
 }
 

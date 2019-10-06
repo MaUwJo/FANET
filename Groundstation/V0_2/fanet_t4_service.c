@@ -254,7 +254,7 @@ void type_4_service_coder (sRawMessage *_tx_message, sWeather *_weather_data)
     }
     _tx_message->m_length += 1;
 
-    encode_abs_coordinates (_tx_message, _weather_data->longitude, _weather_data->latitude);
+    encode_abs_coordinates (_tx_message, _weather_data->latitude, _weather_data->longitude);
 
     if (_seconds <= (_weather_data->time))
     {

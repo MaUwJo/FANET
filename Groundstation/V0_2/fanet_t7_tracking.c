@@ -93,6 +93,7 @@ void type_7_tracking_decoder (sRawMessage *_rx_payload, sGroundTracking *_rx_tra
 
 void type_7_tracking_coder (sRawMessage *_tx_message, sTRACKING *_tx_tracking)
 {
+    // TODO: impl
 }
 
 

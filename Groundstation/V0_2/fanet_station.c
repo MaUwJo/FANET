@@ -274,6 +274,7 @@ void fanet_service_scheduler (void)
 {
     sRadioData			_radiodata;
     sFanetMAC			_fanet_mac;
+    sFanetMAC			_fanet_mac_1;
     sFanetMAC			_fanet_mac_7;
     sWeather			_tx_weather_data;
     sWeather			_rx_weather_data;
@@ -297,6 +298,12 @@ void fanet_service_scheduler (void)
     _fanet_mac_7.cast		= false;
     _fanet_mac_7.signature_bit = false;
     _fanet_mac_7.valid_bit = true;
+
+    _fanet_mac_1.e_header	= false;
+    _fanet_mac_1.forward	= false;
+    _fanet_mac_1.cast		= false;
+    _fanet_mac_1.signature_bit = false;
+    _fanet_mac_1.valid_bit = true;
     //----
 
     if (!_data_timer)
@@ -321,6 +328,7 @@ void fanet_service_scheduler (void)
         terminal_message_4 (true, false, &_radiodata, &_fanet_mac, &_rx_weather_data);
 
         if (b_send_gti == true) {   // Send GroundTrackingInfo for WeatherStation
+            /*
             _fanet_mac_7.type	= 7;
             _fanet_mac_7.s_manufactur_id	= source_manufacturer_id;
             _fanet_mac_7.s_unique_id		= source_unique_id[_i_data];
@@ -328,9 +336,31 @@ void fanet_service_scheduler (void)
             type_4_weather_2_ground_tracking_coder(&_tx_message, &_tx_weather_data);
             fanet_mac_coder (&_radiodata, &_fanet_mac_7, &_tx_message);
 
-            sGroundTracking	_rx_tracking;
-            type_7_tracking_decoder (&_tx_message, &_rx_tracking);
-            terminal_message_7 (0,0, &_radiodata, &_fanet_mac_7, &_rx_tracking);
+            sGroundTracking	_rx_ground_tracking;
+            type_7_tracking_decoder (&_tx_message, &_rx_ground_tracking);
+            terminal_message_7 (0,0, &_radiodata, &_fanet_mac_7, &_rx_ground_tracking);
+*/
+            _fanet_mac_1.type	= 1;
+            _fanet_mac_1.s_manufactur_id	= source_manufacturer_id;
+            _fanet_mac_1.s_unique_id		= source_unique_id[_i_data];
+            _tx_message.m_length = 0;
+
+            sTRACKING _tx_tracking;
+            _tx_tracking.aircraft_type = 5;
+            strcpy(_tx_tracking.aircraft_type_char, "gsX\0");
+            _tx_tracking.longitude = _tx_weather_data.longitude;
+            _tx_tracking.latitude = _tx_weather_data.latitude;
+            _tx_tracking.altitude = _tx_weather_data.altitude;
+            _tx_tracking.heading = 333.0;
+            _tx_tracking.speed = 42.17;
+            _tx_tracking.climb = 4.1;
+            _tx_tracking.turn_rate = 3.2;
+            type_1_tracking_coder (&_tx_message, &_tx_tracking);
+            fanet_mac_coder (&_radiodata, &_fanet_mac_1, &_tx_message);
+
+            sTRACKING _rx_tracking;
+            type_1_tracking_decoder (&_tx_message, &_rx_tracking);
+            terminal_message_1 (0,0, &_radiodata, &_fanet_mac_1, &_rx_tracking);
         }
 
         _i_data++;
