@@ -116,18 +116,57 @@ void decode_climb (sRawMessage *_rx_message, sTRACKING *_tracking)
 	signed char _climb_char;
 	
 	_climb_char = (_rx_message->message[_rx_message->m_pointer]&0x7F);	
-	if (_climb_char & 0x40)												// Check, if minus (-) bit is set
-		_climb_char |= 0x80;
-		
+	if (_climb_char & 0x40) {       // Check, if minus (-) bit is set
+        _climb_char |= 0x80;
+    }
 	_tracking->climb = (float)_climb_char;
 
-	if ((_rx_message->message[_rx_message->m_pointer] & 0x80))
-		_tracking->climb  *= 0.5;										// Return range will be -32.5...-6.5 / +6.5...+31.5 m/s in +-0.5m/s steps
-	else
-		_tracking->climb  *= 0.1;										// Return range will be -6.4...+6.3 m/s in +-0.1m/s steps
-										
+	if ((_rx_message->message[_rx_message->m_pointer] & 0x80)) {
+        _tracking->climb /= 2;     // Return range will be -32.5...-6.5 / +6.5...+31.5 m/s in +-0.5m/s steps
+    } else {
+        _tracking->climb /= 10;   // Return range will be -6.4...+6.3 m/s in +-0.1m/s steps
+    }
 	_rx_message->m_pointer += 1;
 }
+
+void encode_climb (sRawMessage *_tx_message, sTRACKING *_tracking)
+{
+    int climb = _tracking->climb * 10;
+    if ((_tracking->climb > 6.3) || (_tracking->climb < -6.4)) {
+        _tx_message->message[_tx_message->m_length] |= 0x80;    // Climb scaling bit
+        climb = _tracking->climb * 2;
+    }
+    _tx_message->message[_tx_message->m_length] |= (climb & 0x7F);
+    _tx_message->m_length += 1;
+}
+
+void decode_turnrate (sRawMessage *_rx_message, sTRACKING *_tracking)
+{
+    signed char _turnrate_char = (_rx_message->message[_rx_message->m_pointer]&0x7F);
+    if (_turnrate_char & 0x40) {                                                // Check, if minus (-) bit is set
+        _turnrate_char |= 0x80;
+    }
+    _tracking->turn_rate = (float)_turnrate_char;
+
+    if ((_rx_message->message[_rx_message->m_pointer] & 0x80)) {
+        _tracking->turn_rate *= 0.1;                                        // Return range will be -64...-16 / +16...+64 deg/s in +-0.25 deg/s steps
+    } else {
+        _tracking->turn_rate *= 0.5;                                        // Return range will be -15.75...+15.5 deg/s in +-0.1deg/s steps
+    }
+    _rx_message->m_pointer += 1;
+}
+
+void encode_turnrate (sRawMessage *_tx_message, sTRACKING *_tracking)
+{
+    int turnrate = _tracking->turn_rate * 2;
+    if (_tracking->turn_rate >= 16.0 | _tracking->turn_rate <= -16.0) {
+        _tx_message->message[11] |= 0x80;    // Climb scaling bit
+        turnrate = _tracking->turn_rate * 10;
+    }
+    _tx_message->message[11] |= (turnrate & 0x7F);
+    _tx_message->m_length += 1;
+}
+
 
 void decode_heading (sRawMessage *_rx_message, sTRACKING *_tracking)
 {
@@ -164,11 +203,12 @@ void type_1_tracking_decoder (sRawMessage *_rx_payload, sTRACKING *_rx_tracking)
 	decode_aircraft_type (_rx_payload, _rx_tracking);
 	decode_alitude (_rx_payload, _rx_tracking);
 	decode_speed (_rx_payload, _rx_tracking);
-	decode_climb (_rx_payload, _rx_tracking);		
-	decode_heading (_rx_payload, _rx_tracking);
-	
-	_rx_tracking->turn_rate_on = 0;		// No decode routine for turn rate
-	_rx_tracking->turn_rate = 0;
+	decode_climb (_rx_payload, _rx_tracking);
+    decode_heading (_rx_payload, _rx_tracking);
+
+	_rx_tracking->turn_rate_on = 1;		// No decode routine for turn rate
+//	_rx_tracking->turn_rate = 0;
+    decode_turnrate (_rx_payload, _rx_tracking);
 }
 
 
@@ -185,8 +225,11 @@ void type_1_tracking_coder (sRawMessage *_tx_message, sTRACKING *_tx_tracking)
     encode_alitude(_tx_message, _tx_tracking);
     _tx_message->message[7] |= (_tx_tracking->aircraft_type << 4);
     encode_speed(_tx_message, _tx_tracking);
+    encode_climb(_tx_message, _tx_tracking);
     encode_heading(_tx_message, _tx_tracking);
+    encode_turnrate(_tx_message, _tx_tracking);
 
+    _tx_message->m_pointer = 16;
     _tx_message->m_length = 15;
 /*
     _tx_message->message[ 9] = 0x00;    // Climb
