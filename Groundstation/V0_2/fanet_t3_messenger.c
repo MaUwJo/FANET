@@ -31,6 +31,7 @@
 #include "fanet_radio.h"
 
 #include "fanet_t3_messenger.h"
+#include "fanet_terminal.h"
 
 #define STATION_MANUF	0xFC
 #define STATION_ID	0x9002

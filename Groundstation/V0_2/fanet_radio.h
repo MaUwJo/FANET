@@ -24,14 +24,65 @@
 #ifndef FANET_RADIO_H
 #define FANET_RADIO_H
 
+#include <stdbool.h>
+#include <stdint.h>
 
-#include "fanet_struct.h"
-#include "fanet_terminal.h"
+typedef bool boolean;
 
-extern sRadioData	radio_data;
+typedef unsigned char byte;
+
+#ifndef __typedef_RADIODATA
+#	define __typedef_RADIODATA
+typedef struct {
+    int8_t 	rssi;
+    int8_t 	prssi;
+    float 	psnr;
+    char  	coding_rate[5];
+    byte	crc_err;
+    int16_t rx_headers;
+    int16_t	rx_packets;
+    int16_t	tx_packets;
+    int16_t	tx_time;
+    int32_t freq_err;
+    uint32_t timestamp;
+}sRadioData;
+#endif
+
 
 // FANET center frequnecy - EU area
 //unsigned int  freq = 868200000; // in Hz! (868.2) 
+
+#ifndef __typedef_RAW_MESSAGE
+#	define __typedef_RAW_MESSAGE
+typedef struct {
+    char	message[255];
+    byte 	m_length;
+    byte	m_pointer;
+}sRawMessage;
+#endif
+
+#ifndef __typedef_SYSTEM
+#	define __typedef_SYSTEM
+typedef struct {
+    long    timestamp_1min;
+    long    timestamp_15min;
+    float	rssi_avg_1min;
+    float	rssi_avg_15min;
+    int		rssi_max_1min;
+    int		rssi_max_15min;
+    int16_t rx_headers_1min;
+    int16_t rx_headers_15min;
+    int16_t	rx_packets_1min;
+    int16_t	rx_packets_15min;
+    int16_t tx_packets_1min;
+    int16_t tx_packets_15min;
+    int16_t	tx_time_1min;
+    int32_t	tx_time_15min;
+}sSystem;
+#endif
+
+extern sRadioData	radio_data;
+
 
 void selectreceiver();
 

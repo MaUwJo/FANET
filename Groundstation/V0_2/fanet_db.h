@@ -24,6 +24,7 @@
 #ifndef FANET_DB_H
 #define FANET_DB_H
 
+#include "fanet_radio.h"
 #include "fanet_struct.h"
 
 void db_init (char *_db_name);

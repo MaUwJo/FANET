@@ -354,7 +354,7 @@ void fanet_service_scheduler (void)
             _tx_tracking.altitude = _tx_weather_data.altitude;
             _tx_tracking.heading = 333.0;
             _tx_tracking.speed = 42.17;
-            _tx_tracking.climb = 3.0;
+            _tx_tracking.climb = -10.0;
             _tx_tracking.turn_rate = 3.2;
             _tx_tracking.turn_rate_on = true;
             type_1_tracking_coder (&_tx_message, &_tx_tracking);

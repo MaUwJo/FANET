@@ -28,6 +28,7 @@
 #include <string.h>
 #include <math.h>
 #include "fanet_struct.h"
+#include "fanet_radio.h"
 
 #define pi 3.14159265358979323846
 

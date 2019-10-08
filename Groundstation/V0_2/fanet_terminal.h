@@ -24,6 +24,7 @@
 #ifndef FANET_TERMINAL_H
 #define FANET_TERMINAL_H
 
+#include "fanet_radio.h"
 #include "fanet_struct.h"
 
 void terminal_start_screen (byte _sf, int _bandwith, int _freq);

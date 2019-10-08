@@ -44,8 +44,8 @@
 #include <wiringPiSPI.h>
 #include "sx1276Regs-LoRa.h"
 
-#include "fanet_struct.h"
-#include "fanet_terminal.h"
+//#include "fanet_struct.h"
+//#include "fanet_terminal.h"
 
 typedef unsigned char byte;
 

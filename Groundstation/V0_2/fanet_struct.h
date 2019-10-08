@@ -77,15 +77,6 @@ typedef unsigned char byte;
 #endif
 
 
-#ifndef __typedef_RAW_MESSAGE
-#	define __typedef_RAW_MESSAGE
-	typedef struct {
-		char	message[255];
-		byte 	m_length;
-		byte	m_pointer;
-	}sRawMessage;
-#endif
-
 #ifndef __typedef_ACK
 #	define __typedef_ACK
 	typedef struct {
@@ -183,25 +174,6 @@ typedef struct {
 	}sWeather;
 #endif
 
-#ifndef __typedef_SYSTEM
-#	define __typedef_SYSTEM
-	typedef struct {
-		long    timestamp_1min;
-		long    timestamp_15min;		
-		float	rssi_avg_1min;
-		float	rssi_avg_15min;
-		int		rssi_max_1min;
-		int		rssi_max_15min;
-		int16_t rx_headers_1min;
-		int16_t rx_headers_15min;
-		int16_t	rx_packets_1min;
-		int16_t	rx_packets_15min;
-		int16_t tx_packets_1min;
-		int16_t tx_packets_15min;
-		int16_t	tx_time_1min;
-		int32_t	tx_time_15min;		
-	}sSystem;
-#endif
 
 #ifndef __typedef_ROUTING
 #	define __typedef_ROUTING
