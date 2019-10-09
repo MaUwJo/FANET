@@ -7,6 +7,6 @@
 
 #include "fanet_struct.h"
 
-int get_holfuy_weather(const char* holfuy_id, const char* token,sWeather *_weather);
+int get_holfuy_weather(const char* holfuy_id, const char* token, sWeather *_weather);
 
 #endif //FANET_HOLFUY_H

@@ -9,15 +9,14 @@
 
 #include <curl/curl.h>
 #include <curl/easy.h>
-#include "csv.h"
 
 #include "fanet_holfuy.h"
 #include "fanet_struct.h"
 
 const char *holfuyUrlFormat = "http://api.holfuy.com/live/?s=%s&pw=%s";
 
-sWeather hf711_weather;
-sWeather hf795_weather;
+//sWeather hf711_weather;
+//sWeather hf795_weather;
 
 
 struct MemoryStruct {
@@ -83,7 +82,15 @@ int get_holfuy_weather(const char* holfuy_id, const char* token, sWeather *_weat
         fprintf(stderr, "curl_easy_perform() failed: %s\n",
                 curl_easy_strerror(res));
     } else {
-        char **parsed = parse_csv(hf_chunk.memory);
+        char *parsed[20];
+        int numToken = 0;
+        char *token = strtok(hf_chunk.memory, ",");
+        while (token != NULL)
+        {
+            parsed[numToken++] = token;
+            token = strtok(NULL, ",");
+        }
+        parsed[numToken] = NULL;
         float float_value;
         removeSpaces(parsed[0]); // leading space in result string
         if (0 == strcmp(holfuy_id, parsed[0])) {

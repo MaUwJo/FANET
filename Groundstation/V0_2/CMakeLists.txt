@@ -8,7 +8,6 @@ include_directories(. /usr/local/include /usr/include)
 add_executable(get_holfuy
         get_holfuy.c
         fanet_holfuy.c fanet_holfuy.h
-        csv.c csv.h
         )
 
 
@@ -29,7 +28,6 @@ add_executable(fanet_station
         fanet_t4_service.c fanet_t4_service.h
         fanet_t7_tracking.c fanet_t7_tracking.h
         fanet_terminal.c fanet_terminal.h
-        csv.c csv.h
         )
 
 target_link_libraries(fanet_station m wiringPi sqlite3 curl)
