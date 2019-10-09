@@ -40,12 +40,11 @@
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
+
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
 #include "sx1276Regs-LoRa.h"
 
-//#include "fanet_struct.h"
-//#include "fanet_terminal.h"
 
 typedef unsigned char byte;
 

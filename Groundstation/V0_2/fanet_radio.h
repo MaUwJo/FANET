@@ -84,25 +84,8 @@ typedef struct {
 extern sRadioData	radio_data;
 
 
-void selectreceiver();
-
-void unselectreceiver();
-
-// Routine to read one byte from the SPI bus
-byte readReg(byte addr);
-
-// Routine to write one byte to the SPI bus
-void writeReg(byte addr, byte value);
-
-void write_tx_buffer(byte addr, byte *value, byte len);
-
-void writeFIFO(byte addr, sRawMessage *_tx_message); 
-
 void show_register (void);
 
-void configPower (int8_t pw);
-
-void opmode (byte mode);
 
 void read_radio_data (sRadioData *radiodata);
 
@@ -113,12 +96,6 @@ boolean read_rx_data(sRawMessage *_rx_radio, sRadioData *_radiodata);
 void tx_radio_values (sRadioData *_radiodata);
 
 void write_tx_data(sRadioData *_radiodata, sRawMessage *_tx_message);
-
-void init_rpi_spi(void);
-
-void setup_sx1276_LoRa (void);
-
-void init_fanet_radio_b();
 
 void init_fanet_radio(int _delay, boolean _show_msg);
 
