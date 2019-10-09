@@ -301,14 +301,14 @@ void get_weather_station(const char* _station_id, sWeather *_weather_data)
     } else if (0 == strcmp(_station_id, "H711")) {
         // https://holfuy.com/de/map/la=49.20255&lo=8.00506&z=14
         strcpy (_weather_data->name, "Holfuy-WS 711 - Hohenberg/Pfalz");
-        strcpy (_weather_data->short_name, "W711:Hohe");
+        strcpy (_weather_data->short_name, "H711:Hohe");
         _weather_data->longitude =  8.00506;
         _weather_data->latitude  = 49.20255;
         _weather_data->altitude  = 565;
     } else if (0 == strcmp(_station_id, "H795")) {
         // https://holfuy.com/de/map/la=49.23716&lo=8.02495&z=14
         strcpy (_weather_data->name, "Holfuy-WS 795 - Orensberg/Pfalz");
-        strcpy (_weather_data->short_name, "W795:Ori");
+        strcpy (_weather_data->short_name, "H795:Ori");
         _weather_data->longitude =  8.02495;
         _weather_data->latitude  = 49.23716;
         _weather_data->altitude  = 555;

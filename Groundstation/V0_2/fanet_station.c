@@ -32,6 +32,8 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <math.h>
+#include <curl/curl.h>
+#include <curl/easy.h>
 
 #include <getopt.h>
 
@@ -47,15 +49,14 @@
 #include "fanet_t4_service.h"
 #include "fanet_t7_tracking.h"
 #include "fanet_routing.h"
+#include "fanet_holfuy.h"
 
 #include <sys/ioctl.h>
 
 #include <wiringPi.h>
-#include <wiringPiSPI.h>
 
 time_t t;
 struct tm *tm;
-
 
 struct timeval tv;
 struct tm* ptm;
@@ -72,11 +73,21 @@ byte sf = SF7;
 
 // Configure the Weather Stations (In a next Version: Better solution to read out a SQL databench)
 const char * stations_id [] = {
-        "4217", // GER Dummy
+//        "4217", // GER Dummy
         "H711",    // Holfuy Hohenberg
         "H795"     // Holfuy Orensberg
 };
 #define N_STATIONS (sizeof (stations_id) / sizeof (const char *))
+
+//sWeather hGER_weather;
+sWeather h711_weather;
+sWeather h795_weather;
+
+sWeather * wStations [] = {
+//        &hGER_weather,
+        &h711_weather,
+        &h795_weather
+};
 
 const byte source_manufacturer_id = 0xFC;
 const uint16_t source_unique_id [] = {0x9017,0x9711,0x9795};
@@ -279,6 +290,7 @@ void fanet_service_scheduler (void)
     sFanetMAC			_fanet_mac_7;
     sWeather			_tx_weather_data;
     sWeather			_rx_weather_data;
+    sWeather			*_hf_weather_data;
     sRawMessage			_tx_message;
     sName				_tx_name;
     sName				_rx_name;
@@ -314,12 +326,15 @@ void fanet_service_scheduler (void)
         _fanet_mac.s_manufactur_id	= source_manufacturer_id;
         _fanet_mac.s_unique_id		= source_unique_id[_i_data];
 
-        strcpy(_tx_weather_data.id_station, stations_id[_i_data]);
+//        strcpy(_tx_weather_data.id_station, stations_id[_i_data]);
 
-        get_weather_station (stations_id[_i_data], &_tx_weather_data);
-        get_weather_data (&_tx_weather_data);
+//        get_weather_station (stations_id[_i_data], _hf_weather_data);
+//        get_weather_data (&hf711_weather);
+//        _hf_weather_data = &hf711_weather;
         //printf("Longitude %f\n", _weather_data.longitude);
-        type_4_service_coder (&_tx_message, &_tx_weather_data);
+//        type_4_service_coder (&_tx_message, &_tx_weather_data);
+        _hf_weather_data = wStations[_i_data];
+        type_4_service_coder (&_tx_message, _hf_weather_data);
 
         fanet_mac_coder (&_radiodata, &_fanet_mac, &_tx_message);
 
@@ -366,8 +381,9 @@ void fanet_service_scheduler (void)
         }
 
         _i_data++;
-        if (_i_data == N_STATIONS)
+        if (_i_data == N_STATIONS) {
             _i_data = 0;
+        }
         _data_timer = INTERVAL_DATA;
 
     }
@@ -408,6 +424,7 @@ void fanet_service_scheduler (void)
 sWeather this_station;
 sWeather *this_station_data = &this_station;
 
+
 int main (int argc, char *argv[])
 {
 
@@ -416,8 +433,9 @@ int main (int argc, char *argv[])
 
 	char _second_new;
 	char _second_old;
-	//char _minute_new;
-	//char _minute_old;
+	char _minute_new;
+	char _minute_old;
+	char *hf_token = NULL;
 
 	boolean listen_only = false;
 
@@ -431,8 +449,13 @@ int main (int argc, char *argv[])
         } else if (0==strcmp(argv[1], "-gti")) {
             b_send_gti = true;
             printf("-- Sending GTI --\n");
+        } else if (0==strcmp(argv[1], "-hf")) {
+            hf_token = argv[2];
+            printf("-- HF token --\n");
+        }
     }
-    }
+    curl_global_init(CURL_GLOBAL_ALL);
+
     db_login("FANET_Station.db");
     get_station_parameters(this_station_data);
 
@@ -446,17 +469,18 @@ int main (int argc, char *argv[])
     //start_screen();
     terminal_start_screen(sf, 250, freq);
 
+    _minute_new = 0;
     while(1)
     {
 		now = time(0);
 		tm = localtime (&now);
 		_second_new = tm->tm_sec;
-		//_minute_new = tm->tm_min;
+		_minute_new = tm->tm_min;
 
 		system_data();
 		receivepacket();
 
-		if (_second_new!=_second_old)
+		if (_second_new != _second_old)
 		{
 		  _second_old = _second_new;
 
@@ -468,13 +492,21 @@ int main (int argc, char *argv[])
 
 		}
 
-		/*if (_minute_new!=_minute_old)
+		if (_minute_new != _minute_old)
 		{
 			_minute_old = _minute_new;
-			show_register();
-		}*/
+			//show_register();
+			if (hf_token != NULL) {
+                get_weather_station ("H711", &h711_weather);
+                get_holfuy_weather("711", hf_token, &h711_weather);
+                get_weather_station ("H795", &h795_weather);
+                get_holfuy_weather("795", hf_token, &h795_weather);
+            }
+        }
 
         delay(1);
 	}
+
+    curl_global_cleanup();
     return (0);
 }
