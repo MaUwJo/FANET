@@ -26,8 +26,7 @@
 #include <time.h>
 
 #include <curl/curl.h>
-#include <curl/easy.h>
-#include "csv.h"
+//#include <curl/easy.h>
 
 #include "fanet_struct.h"
 #include "fanet_holfuy.h"
