@@ -64,7 +64,7 @@ WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 int get_holfuy_weather(const char* holfuy_id, const char* token, sWeather *_weather) {
     char url[72];
     sprintf(url, holfuyUrlFormat, holfuy_id, token);
-    printf(" - fetching from URL: %s\n", url);
+    printf(" - fetching from URL: %s", url);
 
     CURL *curl_handle;
     CURLcode res;
@@ -82,6 +82,7 @@ int get_holfuy_weather(const char* holfuy_id, const char* token, sWeather *_weat
         fprintf(stderr, "curl_easy_perform() failed: %s\n",
                 curl_easy_strerror(res));
     } else {
+        printf(" : %s\n", hf_chunk.memory);
         char *parsed[20];
         int numToken = 0;
         char *token = strtok(hf_chunk.memory, ",");
@@ -104,7 +105,7 @@ int get_holfuy_weather(const char* holfuy_id, const char* token, sWeather *_weat
                 char time_str[25];
                 sprintf(time_str, "%s %s", parsed[2], parsed[3]);
                 struct tm tm;
-                strptime(time_str, "%Y-%m-%d %H:%M:%S", &tm);
+                strftime(time_str, 100, "%Y-%m-%d %H:%M:%S", &tm);
                 _weather->time = mktime(&tm);
             }
             // Wind - default: m/s
