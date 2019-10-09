@@ -94,97 +94,63 @@ int get_holfuy_weather_json(const char* holfuy_id, const char* token, sWeather *
                 curl_easy_strerror(res));
     } else {
         printf(" : %s\n", hf_chunk.memory);
+        float float_value;
+
+//        char *parsed[20];
+//        int numToken = 0;
 
         jsmn_parser p;
-        jsmntok_t t[128]; /* We expect no more than 128 JSON tokens */
+        jsmntok_t json_tokens[128]; /* We expect no more than 128 JSON tokens */
 
         jsmn_init(&p);
-        int r = jsmn_parse(&p, hf_chunk.memory, strlen(hf_chunk.memory), t, 128);
-        /* Loop over all keys of the root object */
-        for (int i = 1; i < r; i++) {
-            if (jsoneq(hf_chunk.memory, &t[i], "dir") == 0) {
-                /* We may use strndup() to fetch string value */
-                printf("- DIR: %.*s\n", t[i + 1].end - t[i + 1].start,
-                       hf_chunk.memory + t[i + 1].start);
-                i++;
-            } else if (jsoneq(hf_chunk.memory, &t[i], "admin") == 0) {
-                /* We may additionally check if the value is either "true" or "false" */
-                printf("- Admin: %.*s\n", t[i + 1].end - t[i + 1].start,
-                       hf_chunk.memory + t[i + 1].start);
-                i++;
-            } else if (jsoneq(hf_chunk.memory, &t[i], "uid") == 0) {
-                /* We may want to do strtol() here to get numeric value */
-                printf("- UID: %.*s\n", t[i + 1].end - t[i + 1].start,
-                       hf_chunk.memory + t[i + 1].start);
-                i++;
-            } else if (jsoneq(hf_chunk.memory, &t[i], "groups") == 0) {
-                int j;
-                printf("- Groups:\n");
-                if (t[i + 1].type != JSMN_ARRAY) {
-                    continue; /* We expect groups to be an array of strings */
-                }
-                for (j = 0; j < t[i + 1].size; j++) {
-                    jsmntok_t *g = &t[i + j + 2];
-                    printf("  * %.*s\n", g->end - g->start, hf_chunk.memory + g->start);
-                }
-                i += t[i + 1].size + 1;
-            } else {
-                printf("Unexpected key: %.*s\n", t[i].end - t[i].start,
-                       hf_chunk.memory + t[i].start);
-            }
-        }
-        char *parsed[20];
-        int numToken = 0;
+        char *json_string = hf_chunk.memory;
+        char *token_string;
+        int r = jsmn_parse(&p, json_string, strlen(json_string), json_tokens, 128);
 
-        float float_value;
-        removeSpaces(parsed[0]); // leading space in result string
-        if (0 == strcmp(holfuy_id, parsed[0])) {
-            // matching station data returned
-            sprintf(_weather->id_station, "%s", parsed[0]);
-            sprintf(_weather->name, "HF-%s - %s", parsed[0], parsed[1]);
-            sprintf(_weather->short_name, "HF-%s", parsed[0]);
-            // Time
-            _weather->time = 0;
-            if ((NULL != parsed[2]) && (NULL != parsed[3])) {
-                char time_str[25];
-                sprintf(time_str, "%s %s", parsed[2], parsed[3]);
-                struct tm tm;
-                strftime(time_str, 100, "%Y-%m-%d %H:%M:%S", &tm);
-                _weather->time = mktime(&tm);
-            }
-            // Wind - default: m/s
-            _weather->wind = false;
-            _weather->wind_speed = 0.0;
-            _weather->wind_gusts = 0.0;
-            _weather->wind_heading = 0.0;
-            if (NULL != parsed[4]) {
-                _weather->wind_speed = atof(parsed[4]);
-                _weather->wind = true;
-            }
-            if (NULL != parsed[5]) {
-                _weather->wind_gusts = atof(parsed[5]);
-                _weather->wind = true;
-            }
-            if (NULL != parsed[7]) {
-                _weather->wind_heading = atof(parsed[7]);
-                _weather->wind = true;
-            }
-            // Temperature - default: C
-            _weather->temp = false;
-            _weather->temperature = 0.0;
-            if (NULL != parsed[8]) {
+        _weather->time = 0;
+
+        _weather->wind = false;
+        _weather->wind_speed = 0.0;
+        _weather->wind_gusts = 0.0;
+        _weather->wind_heading = 0.0;
+
+        _weather->temp = false;
+        _weather->temperature = 0.0;
+
+        _weather->humid = false;
+        _weather->humidity = 0.0;
+        _weather->barom = false;
+        _weather->barometric = 0.0;
+
+        for (int i = 1; i < r; i++) {
+            if (jsoneq(json_string, &json_tokens[i], "dir") == 0) {
+                token_string = strndup((json_string + json_tokens[i + 1].start),
+                                       (json_tokens[i + 1].end - json_tokens[i + 1].start));
+                _weather->wind_heading = atof(token_string);
+                _weather->wind = false;
+                i++;
+            } else if (jsoneq(json_string, &json_tokens[i], "speed") == 0) {
+                token_string = strndup((json_string + json_tokens[i + 1].start),
+                                       (json_tokens[i + 1].end - json_tokens[i + 1].start));
+                _weather->wind_speed = atof(token_string);
+                i++;
+            } else if (jsoneq(json_string, &json_tokens[i], "gust") == 0) {
+                token_string = strndup((json_string + json_tokens[i + 1].start),
+                                       (json_tokens[i + 1].end - json_tokens[i + 1].start));
+                _weather->wind_gusts = atof(token_string);
+                i++;
+            } else if (jsoneq(json_string, &json_tokens[i], "temperature") == 0) {
+                token_string = strndup((json_string + json_tokens[i + 1].start),
+                                       (json_tokens[i + 1].end - json_tokens[i + 1].start));
+                _weather->temperature = atof(token_string);
                 _weather->temp = true;
-                _weather->temperature = atof(parsed[8]);
+                i++;
             } else {
+//                printf("----- Unexpected key: %.*s\n", json_tokens[i].end - json_tokens[i].start,
+//                       json_string + json_tokens[i].start);
             }
-            // No other sensor so far in 711/795
-            _weather->humid = false;
-            _weather->humidity = 0.0;
-            _weather->barom = false;
-            _weather->barometric = 0.0;
-        } else {
-            error = 1;
         }
+
     }
     curl_easy_cleanup(curl_handle);
     free(hf_chunk.memory);
