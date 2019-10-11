@@ -17,7 +17,7 @@
 #include "fanet_struct.h"
 
 const char *holfuyLiveApiUrlFormat = "http://api.holfuy.com/live/?s=%s&pw=%s";
-//const char *holfuyUrlFormatJson = "http://api.holfuy.com/live/?s=%s&pw=%s,m=JSON";
+const char *holfuyUrlFormatJson = "http://api.holfuy.com/live/?s=%s&m=JSON&loc&pw=%s";
 const char *holfuyPugetUrlFormat = "https://holfuy.com/puget/mjso.php?k=%s";    // flat JSON
 
 
@@ -72,6 +72,119 @@ static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
 }
 
 int get_holfuy_weather_json(const char* holfuy_id, const char* token, sWeather *_weather) {
+
+    char url[72];
+    sprintf(url, holfuyUrlFormatJson, holfuy_id, token);
+    printf(" - fetching JSON from URL: %s", url);
+
+    CURL *curl_handle;
+    CURLcode res;
+    int error = 0;
+    struct MemoryStruct hf_chunk;
+    hf_chunk.memory = malloc(1);  /* will be grown as needed by the realloc above */
+    hf_chunk.size = 0;    /* no data at this point */
+    curl_handle = curl_easy_init();
+    curl_easy_setopt(curl_handle, CURLOPT_URL, url);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)&hf_chunk);
+    curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+    res = curl_easy_perform(curl_handle);
+    if(res != CURLE_OK) {
+        fprintf(stderr, "curl_easy_perform() failed: %s\n",
+                curl_easy_strerror(res));
+    } else {
+        printf(" : %s\n", hf_chunk.memory);
+        float float_value;
+
+//        char *parsed[20];
+//        int numToken = 0;
+
+        jsmn_parser p;
+        jsmntok_t json_tokens[128]; /* We expect no more than 128 JSON tokens */
+
+        jsmn_init(&p);
+        char *json_string = hf_chunk.memory;
+        char *token_string;
+        int r = jsmn_parse(&p, json_string, strlen(json_string), json_tokens, 128);
+
+        _weather->time = 0;
+
+        _weather->wind = false;
+        _weather->wind_speed = 0.0;
+        _weather->wind_gusts = 0.0;
+        _weather->wind_heading = 0.0;
+
+        _weather->temp = false;
+        _weather->temperature = 0.0;
+
+        _weather->humid = false;
+        _weather->humidity = 0.0;
+        _weather->barom = false;
+        _weather->barometric = 0.0;
+
+        for (int i = 1; i < r; i++) {
+            if (jsoneq(json_string, &json_tokens[i], "direction") == 0) {
+                token_string = strndup((json_string + json_tokens[i + 1].start),
+                                       (json_tokens[i + 1].end - json_tokens[i + 1].start));
+                _weather->wind_heading = atof(token_string);
+                _weather->wind = false;
+                i++;
+            } else if (jsoneq(json_string, &json_tokens[i], "speed") == 0) {
+                token_string = strndup((json_string + json_tokens[i + 1].start),
+                                       (json_tokens[i + 1].end - json_tokens[i + 1].start));
+                _weather->wind_speed = atof(token_string);
+                i++;
+            } else if (jsoneq(json_string, &json_tokens[i], "gust") == 0) {
+                token_string = strndup((json_string + json_tokens[i + 1].start),
+                                       (json_tokens[i + 1].end - json_tokens[i + 1].start));
+                _weather->wind_gusts = atof(token_string);
+                i++;
+            } else if (jsoneq(json_string, &json_tokens[i], "temperature") == 0) {
+                token_string = strndup((json_string + json_tokens[i + 1].start),
+                                       (json_tokens[i + 1].end - json_tokens[i + 1].start));
+                _weather->temperature = atof(token_string);
+                _weather->temp = true;
+                i++;
+            } else if (jsoneq(json_string, &json_tokens[i], "stationId") == 0) {
+                token_string = strndup((json_string + json_tokens[i + 1].start),
+                                       (json_tokens[i + 1].end - json_tokens[i + 1].start));
+                sprintf(_weather->id_station, "%s", token_string);
+                i++;
+            } else if (jsoneq(json_string, &json_tokens[i], "stationName") == 0) {
+                token_string = strndup((json_string + json_tokens[i + 1].start),
+                                       (json_tokens[i + 1].end - json_tokens[i + 1].start));
+                sprintf(_weather->name, "%s", token_string);
+                token_string = strndup((json_string + json_tokens[i + 1].start), 4);
+                sprintf(_weather->short_name, "%s", token_string);
+                i++;
+            } else if (jsoneq(json_string, &json_tokens[i], "latitude") == 0) {
+                token_string = strndup((json_string + json_tokens[i + 1].start),
+                                       (json_tokens[i + 1].end - json_tokens[i + 1].start));
+                _weather->latitude = atof(token_string);
+                i++;
+            } else if (jsoneq(json_string, &json_tokens[i], "longitude") == 0) {
+                token_string = strndup((json_string + json_tokens[i + 1].start),
+                                       (json_tokens[i + 1].end - json_tokens[i + 1].start));
+                _weather->longitude = atof(token_string);
+                i++;
+            } else if (jsoneq(json_string, &json_tokens[i], "altitude") == 0) {
+                token_string = strndup((json_string + json_tokens[i + 1].start),
+                                       (json_tokens[i + 1].end - json_tokens[i + 1].start));
+                _weather->altitude = atoi(token_string);
+                i++;
+            } else {
+                printf("----- Unexpected key: %.*s\n", json_tokens[i].end - json_tokens[i].start,
+                       json_string + json_tokens[i].start);
+            }
+        }
+
+    }
+    curl_easy_cleanup(curl_handle);
+    free(hf_chunk.memory);
+    curl_global_cleanup();
+    return error;
+}
+int get_holfuy_puget_json(const char* holfuy_id, const char* token, sWeather *_weather) {
 
     char url[72];
     sprintf(url, holfuyPugetUrlFormat, holfuy_id);
@@ -240,7 +353,7 @@ int get_holfuy_weather(const char* holfuy_id, const char* token, sWeather *_weat
         }
     }
     curl_easy_cleanup(curl_handle);
-    free(hf_chunk.memory);
+//    free(hf_chunk.memory);
     curl_global_cleanup();
     return error;
 }

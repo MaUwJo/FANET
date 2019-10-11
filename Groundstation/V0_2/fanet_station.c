@@ -497,10 +497,11 @@ int main (int argc, char *argv[])
 			_minute_old = _minute_new;
 			//show_register();
 			if (hf_token != NULL) {
-                get_weather_station ("H711", &h711_weather);
-                get_holfuy_weather("711", hf_token, &h711_weather);
-                get_weather_station ("H795", &h795_weather);
-                get_holfuy_weather("795", hf_token, &h795_weather);
+//                get_weather_station ("H711", &h711_weather);
+//                get_holfuy_weather("711", hf_token, &h711_weather);
+//                get_weather_station ("H795", &h795_weather);
+                get_holfuy_weather_json("795", hf_token, &h795_weather);
+                get_holfuy_weather_json("711", hf_token, &h711_weather);
             }
         }
 

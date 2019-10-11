@@ -9,5 +9,6 @@
 
 int get_holfuy_weather(const char* holfuy_id, const char* token, sWeather *_weather);
 int get_holfuy_weather_json(const char* holfuy_id, const char* token, sWeather *_weather);
+int get_holfuy_puget_json(const char* holfuy_id, const char* token, sWeather *_weather);
 
 #endif //FANET_HOLFUY_H
