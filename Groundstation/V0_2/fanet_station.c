@@ -90,7 +90,7 @@ sWeather * wStations [] = {
 };
 
 const byte source_manufacturer_id = 0xFC;
-const uint16_t source_unique_id [] = {0x9017,0x9711,0x9795};
+const uint16_t source_unique_id [] = {0x0711,0x0795};
 
 
 #define	START_OFFSET_DATA	4;				// Starts the first transmission of weather data after 4 sec. when the software has started
@@ -500,8 +500,10 @@ int main (int argc, char *argv[])
 //                get_weather_station ("H711", &h711_weather);
 //                get_holfuy_weather("711", hf_token, &h711_weather);
 //                get_weather_station ("H795", &h795_weather);
-                get_holfuy_weather_json("795", hf_token, &h795_weather);
-                get_holfuy_weather_json("711", hf_token, &h711_weather);
+//                get_holfuy_weather_json("795", hf_token, &h795_weather);
+//                get_holfuy_weather_json("711", hf_token, &h711_weather);
+                get_windy_json("holfuy-795", &h795_weather);
+                get_windy_json("holfuy-711", &h711_weather);
             }
         }
 

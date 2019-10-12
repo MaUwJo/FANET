@@ -47,8 +47,9 @@ int main(int argc, char *argv[])
     strcpy(hf795_weather.short_name, "HF795/Ori");
 */
 //    get_holfuy_weather("711", argv[1], &hf711_weather);
-    get_holfuy_puget_json("711", argv[1], &hf795_weather);
+//    get_holfuy_puget_json("711", argv[1], &hf795_weather);
     get_holfuy_weather_json("795", argv[1], &hf795_weather);
+    get_windy_json("holfuy-711", &hf711_weather);
 
     curl_global_cleanup();
     return 0;

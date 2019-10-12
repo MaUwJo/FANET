@@ -245,7 +245,7 @@ void type_4_service_coder (sRawMessage *_tx_message, sWeather *_weather_data)
     // Checks if weather date are not older than MAX_OLD_WEATHER_DATA
     // If weather data are too old, don't fill data in
     _tx_message->message[_tx_message->m_length] = 0;
-    if (_seconds <= (_weather_data->time))
+//    if (_seconds <= (_weather_data->time))
     {
         if (_weather_data->temp) _tx_message->message[_tx_message->m_length] |= 0x40;
         if (_weather_data->wind) _tx_message->message[_tx_message->m_length] |= 0x20;
@@ -256,7 +256,7 @@ void type_4_service_coder (sRawMessage *_tx_message, sWeather *_weather_data)
 
     encode_abs_coordinates (_tx_message, _weather_data->latitude, _weather_data->longitude);
 
-    if (_seconds <= (_weather_data->time))
+//    if (_seconds <= (_weather_data->time))
     {
         if (_weather_data->temp)
             code_temperature (_tx_message, _weather_data);
