@@ -19,8 +19,7 @@
 const char *holfuyLiveApiUrlFormat = "http://api.holfuy.com/live/?s=%s&pw=%s";
 const char *holfuyUrlFormatJson = "http://api.holfuy.com/live/?s=%s&m=JSON&loc&pw=%s";
 const char *holfuyPugetUrlFormat = "https://holfuy.com/puget/mjso.php?k=%s";    // flat JSON
-const char *windyUrlFormat = "https://winds.mobi/api/2/stations/?ids=%s";
-
+const char *windsMobyUrlFormat = "https://winds.mobi/api/2/stations/?ids=%s";
 
 struct MemoryStruct {
     char *memory;
@@ -72,9 +71,9 @@ static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
     return -1;
 }
 
-int get_windy_json(const char* station_id, sWeather *_weather) {
+int get_winds_mobi_json(const char* station_id, sWeather *_weather) {
     char url[72];
-    sprintf(url, windyUrlFormat, station_id);
+    sprintf(url, windsMobyUrlFormat, station_id);
     printf(" - fetching JSON from URL: %s", url);
 
     CURL *curl_handle;
@@ -318,7 +317,7 @@ int get_holfuy_weather_json(const char* holfuy_id, const char* token, sWeather *
 
     }
     curl_easy_cleanup(curl_handle);
-    free(hf_chunk.memory);
+//    free(hf_chunk.memory);
     curl_global_cleanup();
     return error;
 }

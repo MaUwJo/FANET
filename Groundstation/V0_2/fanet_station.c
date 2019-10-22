@@ -50,6 +50,7 @@
 #include "fanet_t7_tracking.h"
 #include "fanet_routing.h"
 #include "fanet_holfuy.h"
+#include "fanet_enbw.h"
 
 #include <sys/ioctl.h>
 
@@ -73,25 +74,32 @@ byte sf = SF7;
 
 // Configure the Weather Stations (In a next Version: Better solution to read out a SQL databench)
 const char * stations_id [] = {
-//        "4217", // GER Dummy
-        "H711",    // Holfuy Hohenberg
-        "H795"     // Holfuy Orensberg
+//        "4217",   // GER Dummy
+        "H711\0",   // Holfuy Hohenberg
+        "EBFF\0",    // EnBw Freckenfeld
+        "H795\0"    // Holfuy Orensberg
 };
+
 #define N_STATIONS (sizeof (stations_id) / sizeof (const char *))
 
 //sWeather hGER_weather;
 sWeather h711_weather;
+sWeather enbw_weather;
 sWeather h795_weather;
 
 sWeather * wStations [] = {
 //        &hGER_weather,
         &h711_weather,
+        &enbw_weather,
         &h795_weather
 };
 
 const byte source_manufacturer_id = 0xFC;
-const uint16_t source_unique_id [] = {0x0711,0x0795};
-
+const uint16_t source_unique_id [] = {
+        0x0711,
+        0xebff,
+        0x0795
+};
 
 #define	START_OFFSET_DATA	4;				// Starts the first transmission of weather data after 4 sec. when the software has started
 #define START_OFFSET_NAME	8;				// Starts the first transmission of weather station name after 8 sec. when the software has started
@@ -108,7 +116,7 @@ void die(const char *s)
     exit(1);
 }
 
-extern unsigned int  freq; // = 868200000; // in Hz! (868.2)  - TTTTT
+extern unsigned int  freq; // = 868200000; // in Hz! (868.2)
 
 void system_data ()
 {
@@ -413,8 +421,9 @@ void fanet_service_scheduler (void)
         terminal_message_2 (true, false, &_radiodata, &_fanet_mac, &_rx_name);
 
         _i_name++;
-        if (_i_name == N_STATIONS)
+        if (_i_name == N_STATIONS) {
             _i_name = 0;
+        }
         _name_timer = INTERVAL_NAME;
     }
     _name_timer--;
@@ -436,6 +445,7 @@ int main (int argc, char *argv[])
 	char _minute_new;
 	char _minute_old;
 	char *hf_token = NULL;
+    char *en_token = NULL;
 
 	boolean listen_only = false;
 
@@ -452,6 +462,10 @@ int main (int argc, char *argv[])
         } else if (0==strcmp(argv[1], "-hf")) {
             hf_token = argv[2];
             printf("-- HF token --\n");
+            if (0 == strcmp(argv[3], "-en")) {
+                en_token = argv[4];
+                printf("-- EN token --\n");
+            }
         }
     }
     curl_global_init(CURL_GLOBAL_ALL);
@@ -500,10 +514,13 @@ int main (int argc, char *argv[])
 //                get_weather_station ("H711", &h711_weather);
 //                get_holfuy_weather("711", hf_token, &h711_weather);
 //                get_weather_station ("H795", &h795_weather);
-//                get_holfuy_weather_json("795", hf_token, &h795_weather);
-//                get_holfuy_weather_json("711", hf_token, &h711_weather);
-                get_windy_json("holfuy-795", &h795_weather);
-                get_windy_json("holfuy-711", &h711_weather);
+                get_holfuy_weather_json("795", hf_token, &h795_weather);
+                get_holfuy_weather_json("711", hf_token, &h711_weather);
+
+                get_weather_station ("EBFF", &enbw_weather);
+                get_enbw_park_json("DERP_.FFD01WN", en_token, &enbw_weather);
+//                get_winds_mobi_json("holfuy-795", &h795_weather);
+//                get_winds_mobi_json("holfuy-711", &h711_weather);
             }
         }
 

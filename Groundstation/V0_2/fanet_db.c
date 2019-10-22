@@ -28,6 +28,8 @@
 #include "fanet_struct.h"
 #include "fanet_global.h"
 #include "fanet_db.h"
+#include <time.h>
+#include "aprs-is.h"
 
 #define KNRM  "\x1B[0m"		// Color: Normal
 #define KRED  "\x1B[31m"	// Color: Red
@@ -274,6 +276,13 @@ void get_weather_data(sWeather *_weather_data)
 
         _weather_data->temp         = true;
         _weather_data->temperature  = 17.95;
+    } else if (0 == strcmp(_weather_data->id_station, "EBFF")) {
+        // Windpark Freckenfeld
+        _weather_data->wind         = true;
+        _weather_data->wind_speed   = 17.0;
+        _weather_data->wind_gusts   = 42.0;
+        _weather_data->wind_heading = 135;
+        _weather_data->temp         = false;
     } else {
         _weather_data->wind         = true;
         _weather_data->wind_speed   = 10.0;
@@ -293,6 +302,7 @@ void get_weather_station(const char* _station_id, sWeather *_weather_data)
 //	sql_get_weather_station (conn, res, row, _weather_data);
     if (0 == strcmp(_station_id, "4217")) {
         // GER - Dummy
+        strcpy (_weather_data->id_station, _station_id);
         strcpy (_weather_data->name, "GS:Germersche/Palz");
         strcpy (_weather_data->short_name, "GS-G");
         _weather_data->longitude =  8.37;
@@ -300,18 +310,29 @@ void get_weather_station(const char* _station_id, sWeather *_weather_data)
         _weather_data->altitude  = 117;
     } else if (0 == strcmp(_station_id, "H711")) {
         // https://holfuy.com/de/map/la=49.20255&lo=8.00506&z=14
+        strcpy (_weather_data->id_station, _station_id);
         strcpy (_weather_data->name, "Holfuy-WS 711 - Hohenberg/Pfalz");
-        strcpy (_weather_data->short_name, "H711:Hohe");
+        strcpy (_weather_data->short_name, "Hohe");
         _weather_data->longitude =  8.00506;
         _weather_data->latitude  = 49.20255;
         _weather_data->altitude  = 565;
     } else if (0 == strcmp(_station_id, "H795")) {
         // https://holfuy.com/de/map/la=49.23716&lo=8.02495&z=14
+        strcpy (_weather_data->id_station, _station_id);
         strcpy (_weather_data->name, "Holfuy-WS 795 - Orensberg/Pfalz");
-        strcpy (_weather_data->short_name, "H795:Ori");
+        strcpy (_weather_data->short_name, "Ori");
         _weather_data->longitude =  8.02495;
         _weather_data->latitude  = 49.23716;
         _weather_data->altitude  = 555;
+    } else if (0 == strcmp(_station_id, "EBFF")) {
+        // Windpark Freckenfeld
+        strcpy (_weather_data->id_station, _station_id);
+        strcpy (_weather_data->name, "EnBw Windpark Freckenfeld");
+        strcpy (_weather_data->short_name, "FrFd");
+        strcpy (_weather_data->id_station, _station_id);
+        _weather_data->longitude =  8.1159;
+        _weather_data->latitude  = 49.0661;
+        _weather_data->altitude  = 234;
     } else {
         printf("ID: %s\n", _station_id);
         strcpy (_weather_data->id_station, _station_id);
@@ -338,11 +359,53 @@ void write_system_data_15min (sSystem *_system_data)
 void write_object_tracking (sRadioData *_radiodata, sFanetMAC *_fanet_mac, sTRACKING *_tracking)
 {
 //	sql_write_tracking_data (conn, res, row, _radiodata, _fanet_mac, _tracking);
+    char      result[1025] = "\0";
+    time_t    t               = time(NULL);
+    struct tm *now            = gmtime(&t); // APRS uses GMT
+    // FLR11xxxx>APRS,qAS,GroundStation:112233h4910.17N/00808.42Eg000/000/A=000505 !W45! id1E11xxxx
+    // callsign           groundstation time   lat      lon                 alt          id
+    char callsign[6];
+    sprintf(callsign, "%02x%04x",_fanet_mac->s_manufactur_id, _fanet_mac->s_unique_id);
+    printf("-- CallSign: %s", callsign);
+    sprintf(result, "FNT%s>APRS,qAS,%s:/%.2d%.2d%.2dh%f/%fg000/000/A=%5d !W45! id1E%s",
+            callsign, "FanGerPlz",
+            now->tm_hour, now->tm_min, now->tm_sec,
+            _tracking->latitude, _tracking->longitude, _tracking->altitude,
+            callsign);
+    strncat(result, "\n\0", 2);
+    printf("-- Ground Tracking Packet: %s", result);
 }
 
 void write_object_ground_tracking (sRadioData *_radiodata, sFanetMAC *_fanet_mac, sGroundTracking *_tracking)
 {
 //	sql_write_tracking_data (conn, res, row, _radiodata, _fanet_mac, _tracking);
+// propagate to APRS-IS
+    char      result[1025] = "\0";
+    time_t    t               = time(NULL);
+    struct tm *now            = gmtime(&t); // APRS uses GMT
+    // FLR11xxxx>APRS,qAS,GroundStation:112233h4910.17N/00808.42Eg000/000/A=000505 !W45! id1E11xxxx
+    // callsign           groundstation time   lat      lon                 alt          id
+    char callsign[6];
+    sprintf(callsign, "%02X%04X",_fanet_mac->s_manufactur_id, _fanet_mac->s_unique_id);
+    printf("-- CallSign: %s", callsign);
+    sprintf(result, "FLR%s>APRS,qAS,%s:/%.2d%.2d%.2dh%04.2fN/00%3.2fEg000/000/A=%s !W45! id1E%s",
+            callsign, "FanGerPlz",
+            now->tm_hour, now->tm_min, now->tm_sec,
+            (_tracking->latitude*100), (_tracking->longitude*100), "00333",
+            callsign);
+    strncat(result, "\r\n\0", 3);
+    printf("-- Ground Tracking Packet: %s", result);
+    char *server = "glidern5.glidernet.org";
+    unsigned int port = 14580;
+    char *username = "TTT";
+    char *password = "29622";
+    char *program  = "TTT";
+    char *version  = "0.1";
+
+    printf("-- sending: %s", result);
+    if (strlen(server) && strlen(username) && strlen(password) && port != 0) {
+        sendPacket(server, port, username, password, program, version, result);
+    }
 }
 
 

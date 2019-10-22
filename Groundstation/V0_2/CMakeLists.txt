@@ -5,19 +5,11 @@ set(CMAKE_C_STANDARD 11)
 
 include_directories(. /usr/local/include /usr/include)
 
-add_executable(get_holfuy
-        get_holfuy.c
-        fanet_holfuy.c fanet_holfuy.h
-        )
-
-
 add_executable(fanet_station
         fanet_station.c
         sx1276Regs-LoRa.h
         fanet_global.c fanet_global.h
         fanet_mac.c fanet_mac.h
-        fanet_db.c fanet_db.h
-        fanet_holfuy.c fanet_holfuy.h
         fanet_radio.c fanet_radio.h
         fanet_routing.c fanet_routing.h
         fanet_struct.c fanet_struct.h
@@ -28,7 +20,27 @@ add_executable(fanet_station
         fanet_t4_service.c fanet_t4_service.h
         fanet_t7_tracking.c fanet_t7_tracking.h
         fanet_terminal.c fanet_terminal.h
+        fanet_db.c fanet_db.h
+        fanet_holfuy.c fanet_holfuy.h
+        fanet_enbw.c fanet_enbw.h
+        aprs-is.c aprs-is.h
+        )
+
+add_executable(get_holfuy
+        get_holfuy.c
+        fanet_holfuy.c fanet_holfuy.h
+        )
+
+add_executable(get_enbw
+        get_enbw.c
+        fanet_enbw.c fanet_enbw.h
+        )
+
+add_executable(aprs-is-simple
+        aprs-is.c aprs-is.h
+        aprs-is-simple.c
         )
 
 target_link_libraries(fanet_station m wiringPi sqlite3 curl)
 target_link_libraries(get_holfuy sqlite3 curl)
+target_link_libraries(get_enbw sqlite3 curl)

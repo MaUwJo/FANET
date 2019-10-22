@@ -1,5 +1,5 @@
 /*
- * get_holfuy.c
+ * get_enbw.c
  *
  * Copyright 2019  <pi@pi4>
  *
@@ -29,30 +29,17 @@
 //#include <curl/easy.h>
 
 #include "fanet_struct.h"
-#include "fanet_holfuy.h"
+#include "fanet_enbw.h"
 
-sWeather hf711_weather;
-sWeather hf795_weather;
 sWeather enbw_weather;
 
 
 int main(int argc, char *argv[])
 {
     curl_global_init(CURL_GLOBAL_ALL);
-/*
-    strcpy(hf711_weather.id_station, "HF711");
-    strcpy(hf711_weather.name, "Holfuy Station Hohenberg");
-    strcpy(hf711_weather.short_name, "HF711/Hohe");
-    strcpy(hf795_weather.id_station, "HF795");
-    strcpy(hf795_weather.name, "Holfuy Station Orensberg");
-    strcpy(hf795_weather.short_name, "HF795/Ori");
-*/
-//    get_holfuy_weather("711", argv[1], &hf711_weather);
-//    get_holfuy_puget_json("711", argv[1], &hf795_weather);
-    get_holfuy_weather_json("795", argv[1], &hf795_weather);
-    get_winds_mobi_json("holfuy-711", &hf711_weather);
     // https://ecockpit2.azurewebsites.net/logic/measurements/park/DERP_.FFD01WN/
-    get_enbw_park_json("DERP_.FFD01WN", &enbw_weather);
+    char *en_token = "TTT";
+    get_enbw_park_json("DERP_.FFD01WN", en_token, &enbw_weather);
     curl_global_cleanup();
     return 0;
 }
